@@ -16,6 +16,22 @@ class StringLiteral(Node):
 
 
 @dataclass
+class Identifier(Node):
+    name: str
+
+
+@dataclass
+class NumberLiteral(Node):
+    value: int
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     argument: Node
+
+
+@dataclass
+class VariableAssignment(Node):
+    name: str
+    value: Node
