@@ -52,6 +52,13 @@ class IndexAccess(Node):
 
 
 @dataclass
+class MethodCall(Node):
+    target: Node
+    name: str
+    arguments: list
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     arguments: list
