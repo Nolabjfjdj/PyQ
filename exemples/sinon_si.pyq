@@ -1,0 +1,17 @@
+age = 16
+
+si age < 13:
+    afficher("Enfant")
+sinon si age < 18:
+    afficher("Adolescent")
+sinon:
+    afficher("Adulte")
+
+age = 25
+
+si age < 13:
+    afficher("Enfant")
+sinon si age < 18:
+    afficher("Adolescent")
+sinon:
+    afficher("Adulte")
