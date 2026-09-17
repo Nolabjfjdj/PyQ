@@ -1,0 +1,17 @@
+nombres = [10, 20, 30, 40]
+
+afficher(nombres[0])
+afficher(nombres[2])
+
+nombres[1] = 50
+
+afficher(nombres[1])
+
+valeurs = [10 + 5, 20 * 2, 30]
+
+afficher(valeurs[0])
+afficher(valeurs[1])
+
+vide = []
+
+afficher(vide)
