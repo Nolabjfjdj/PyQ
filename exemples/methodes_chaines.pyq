@@ -1,0 +1,15 @@
+texte = "Bonjour le monde"
+
+afficher(texte.taille())
+
+afficher(texte.contient("Bonjour"))
+afficher(texte.contient("Python"))
+
+afficher(texte.commence_par("Bonjour"))
+afficher(texte.commence_par("Salut"))
+
+afficher(texte.finit_par("monde"))
+afficher(texte.finit_par("PyQ"))
+
+afficher(texte[0])
+afficher(texte[8])
