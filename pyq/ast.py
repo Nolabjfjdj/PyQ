@@ -117,3 +117,13 @@ class ForStatement(Node):
     variable: str
     iterable: Node
     body: list
+
+
+@dataclass
+class BreakStatement(Node):
+    pass
+
+
+@dataclass
+class ContinueStatement(Node):
+    pass
