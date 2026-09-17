@@ -246,4 +246,4 @@ class Lexer:
 
             raise SyntaxError(
                 f"Caractère inattendu '{char}' à la ligne {line_number}"
-            )
+            ) 
