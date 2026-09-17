@@ -45,9 +45,7 @@ class Lexer:
                     )
 
                 elif indentation < self.indentation_stack[-1]:
-                    while (
-                        indentation < self.indentation_stack[-1]
-                    ):
+                    while indentation < self.indentation_stack[-1]:
                         self.indentation_stack.pop()
                         self.tokens.append(
                             Token("DEDENT", position=line_number)
@@ -218,6 +216,7 @@ class Lexer:
                 "{": "LBRACE",
                 "}": "RBRACE",
                 ",": "COMMA",
+                ".": "DOT",
             }
 
             if char in single_tokens:
