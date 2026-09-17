@@ -1,0 +1,11 @@
+age = 14
+
+afficher(age >= 13 et age <= 18)
+afficher(age < 10 ou age == 14)
+
+connecte = faux
+
+afficher(non connecte)
+
+si age >= 13 et age <= 18:
+    afficher("Adolescent")
