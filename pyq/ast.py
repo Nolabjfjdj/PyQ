@@ -41,9 +41,20 @@ class ListLiteral(Node):
 
 
 @dataclass
+class DictLiteral(Node):
+    entries: list
+
+
+@dataclass
 class ListAccess(Node):
     list_node: Node
     index: Node
+
+
+@dataclass
+class DictAccess(Node):
+    dict_node: Node
+    key: Node
 
 
 @dataclass
@@ -59,8 +70,8 @@ class VariableAssignment(Node):
 
 
 @dataclass
-class ListAssignment(Node):
-    list_node: Node
+class IndexAssignment(Node):
+    target: Node
     index: Node
     value: Node
 
