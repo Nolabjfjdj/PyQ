@@ -114,7 +114,9 @@ class Interpreter:
                 statement
             )
 
-        except PyQRuntimeError:
+        except PyQRuntimeError as error:
+            if error.node is None:
+                error.node = statement
             raise
 
         except (TypeError, ValueError, IndexError) as error:
