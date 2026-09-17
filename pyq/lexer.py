@@ -38,6 +38,26 @@ class Lexer:
                 self.position += 1
                 continue
 
+            if char == "+":
+                tokens.append(Token("PLUS", "+", self.position))
+                self.position += 1
+                continue
+
+            if char == "-":
+                tokens.append(Token("MINUS", "-", self.position))
+                self.position += 1
+                continue
+
+            if char == "*":
+                tokens.append(Token("STAR", "*", self.position))
+                self.position += 1
+                continue
+
+            if char == "/":
+                tokens.append(Token("SLASH", "/", self.position))
+                self.position += 1
+                continue
+
             if char == '"':
                 tokens.append(self._read_string())
                 continue
