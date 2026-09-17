@@ -186,6 +186,20 @@ class Parser:
         ):
             self.advance()
 
+            if (
+                self.current().type == "IDENTIFIER"
+                and self.current().value == "si"
+            ):
+                else_body = [
+                    self.parse_if()
+                ]
+
+                return IfStatement(
+                    condition,
+                    body,
+                    else_body
+                )
+
             self.expect("COLON")
             self.expect("NEWLINE")
             self.expect("INDENT")
