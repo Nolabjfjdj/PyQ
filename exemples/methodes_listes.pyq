@@ -1,0 +1,19 @@
+nombres = [10, 20, 30]
+
+afficher(nombres.taille())
+
+nombres.ajouter(40)
+
+afficher(nombres)
+afficher(nombres.taille())
+
+nombres.retirer(20)
+
+afficher(nombres)
+afficher(nombres.taille())
+
+nombres.ajouter(50)
+nombres.ajouter(60)
+
+afficher(nombres)
+afficher(nombres.taille())
