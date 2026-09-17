@@ -1,0 +1,9 @@
+nombres = [1, 2, 3, 4, 5]
+
+pour nombre dans nombres:
+    afficher(nombre)
+
+valeurs = [10, 20, 30]
+
+pour valeur dans valeurs:
+    afficher(valeur * 2)
