@@ -5,6 +5,7 @@ from .ast import (
     Identifier,
     FunctionCall,
     VariableAssignment,
+    BinaryOperation,
 )
 
 
@@ -75,6 +76,39 @@ class Parser:
         return FunctionCall(name, argument)
 
     def parse_expression(self):
+        return self.parse_addition()
+
+    def parse_addition(self):
+        expression = self.parse_multiplication()
+
+        while self.current().type in ("PLUS", "MINUS"):
+            operator = self.advance().value
+            right = self.parse_multiplication()
+
+            expression = BinaryOperation(
+                expression,
+                operator,
+                right
+            )
+
+        return expression
+
+    def parse_multiplication(self):
+        expression = self.parse_primary()
+
+        while self.current().type in ("STAR", "SLASH"):
+            operator = self.advance().value
+            right = self.parse_primary()
+
+            expression = BinaryOperation(
+                expression,
+                operator,
+                right
+            )
+
+        return expression
+
+    def parse_primary(self):
         token = self.current()
 
         if token.type == "STRING":
@@ -88,6 +122,15 @@ class Parser:
         if token.type == "IDENTIFIER":
             self.advance()
             return Identifier(token.value)
+
+        if token.type == "LPAREN":
+            self.advance()
+
+            expression = self.parse_expression()
+
+            self.expect("RPAREN")
+
+            return expression
 
         raise SyntaxError(
             f"Expression invalide à la position {token.position}"
