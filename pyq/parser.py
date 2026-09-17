@@ -8,6 +8,7 @@ from .ast import (
     ListLiteral,
     DictLiteral,
     IndexAccess,
+    MethodCall,
     FunctionCall,
     VariableAssignment,
     IndexAssignment,
@@ -476,7 +477,8 @@ class Parser:
 
         if token.type == "STRING":
             self.advance()
-            return StringLiteral(token.value)
+            expression = StringLiteral(token.value)
+            return self.parse_postfix(expression)
 
         if token.type == "NUMBER":
             self.advance()
@@ -486,7 +488,8 @@ class Parser:
             else:
                 value = int(token.value)
 
-            return NumberLiteral(value)
+            expression = NumberLiteral(value)
+            return self.parse_postfix(expression)
 
         if token.type == "IDENTIFIER":
             self.advance()
@@ -524,15 +527,15 @@ class Parser:
             else:
                 expression = Identifier(token.value)
 
-            return self.parse_index_access(expression)
+            return self.parse_postfix(expression)
 
         if token.type == "LBRACKET":
             expression = self.parse_list()
-            return self.parse_index_access(expression)
+            return self.parse_postfix(expression)
 
         if token.type == "LBRACE":
             expression = self.parse_dict()
-            return self.parse_index_access(expression)
+            return self.parse_postfix(expression)
 
         if token.type == "LPAREN":
             self.advance()
@@ -541,26 +544,62 @@ class Parser:
 
             self.expect("RPAREN")
 
-            return self.parse_index_access(expression)
+            return self.parse_postfix(expression)
 
         raise SyntaxError(
             f"Expression invalide à la position {token.position}"
         )
 
-    def parse_index_access(self, expression):
-        while self.current().type == "LBRACKET":
-            self.advance()
+    def parse_postfix(self, expression):
+        while True:
+            if self.current().type == "LBRACKET":
+                self.advance()
 
-            index = self.parse_expression()
+                index = self.parse_expression()
 
-            self.expect("RBRACKET")
+                self.expect("RBRACKET")
 
-            expression = IndexAccess(
-                expression,
-                index
-            )
+                expression = IndexAccess(
+                    expression,
+                    index
+                )
+
+                continue
+
+            if self.current().type == "DOT":
+                self.advance()
+
+                name = self.expect("IDENTIFIER").value
+
+                self.expect("LPAREN")
+
+                arguments = []
+
+                if self.current().type != "RPAREN":
+                    while True:
+                        arguments.append(self.parse_expression())
+
+                        if self.current().type != "COMMA":
+                            break
+
+                        self.advance()
+
+                self.expect("RPAREN")
+
+                expression = MethodCall(
+                    expression,
+                    name,
+                    arguments
+                )
+
+                continue
+
+            break
 
         return expression
+
+    def parse_index_access(self, expression):
+        return self.parse_postfix(expression)
 
     def parse_list(self):
         self.expect("LBRACKET")
