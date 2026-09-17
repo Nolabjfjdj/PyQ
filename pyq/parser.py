@@ -8,6 +8,7 @@ from .ast import (
     VariableAssignment,
     BinaryOperation,
     Comparison,
+    IfStatement,
 )
 
 
@@ -34,11 +35,23 @@ class Parser:
 
         return self.advance()
 
+    def skip_newlines(self):
+        while self.current().type == "NEWLINE":
+            self.advance()
+
     def parse(self):
         statements = []
 
+        self.skip_newlines()
+
         while self.current().type != "EOF":
+            if self.current().type == "DEDENT":
+                self.advance()
+                continue
+
             statements.append(self.parse_statement())
+
+            self.skip_newlines()
 
         return Program(statements)
 
@@ -50,12 +63,68 @@ class Parser:
                 f"Instruction invalide à la position {token.position}"
             )
 
+        if token.value == "si":
+            return self.parse_if()
+
         next_token = self.tokens[self.position + 1]
 
         if next_token.type == "EQUALS":
-            return self.parse_assignment()
+            statement = self.parse_assignment()
+        else:
+            statement = self.parse_function_call()
 
-        return self.parse_function_call()
+        self.expect("NEWLINE") if self.current().type == "NEWLINE" else None
+
+        return statement
+
+    def parse_if(self):
+        self.expect("IDENTIFIER")
+
+        condition = self.parse_expression()
+
+        self.expect("COLON")
+        self.expect("NEWLINE")
+        self.expect("INDENT")
+
+        body = []
+
+        self.skip_newlines()
+
+        while self.current().type not in ("DEDENT", "EOF"):
+            body.append(self.parse_statement())
+            self.skip_newlines()
+
+        if self.current().type == "DEDENT":
+            self.advance()
+
+        else_body = None
+
+        if (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "sinon"
+        ):
+            self.advance()
+
+            self.expect("COLON")
+            self.expect("NEWLINE")
+            self.expect("INDENT")
+
+            else_body = []
+
+            self.skip_newlines()
+
+            while self.current().type not in ("DEDENT", "EOF"):
+                else_body.append(self.parse_statement())
+                self.skip_newlines()
+
+            if self.current().type == "DEDENT":
+                self.advance()
+
+        return IfStatement(
+            condition,
+            body,
+            else_body
+        )
 
     def parse_assignment(self):
         name = self.expect("IDENTIFIER").value
