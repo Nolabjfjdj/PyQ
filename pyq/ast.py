@@ -44,7 +44,7 @@ class ListAccess(Node):
 @dataclass
 class FunctionCall(Node):
     name: str
-    argument: Node
+    arguments: list
 
 
 @dataclass
@@ -58,6 +58,18 @@ class ListAssignment(Node):
     list_node: Node
     index: Node
     value: Node
+
+
+@dataclass
+class FunctionDefinition(Node):
+    name: str
+    parameters: list
+    body: list
+
+
+@dataclass
+class ReturnStatement(Node):
+    value: Node | None
 
 
 @dataclass
