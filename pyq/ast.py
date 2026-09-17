@@ -57,6 +57,19 @@ class Comparison(Node):
 
 
 @dataclass
+class LogicalOperation(Node):
+    left: Node
+    operator: str
+    right: Node
+
+
+@dataclass
+class UnaryOperation(Node):
+    operator: str
+    operand: Node
+
+
+@dataclass
 class IfStatement(Node):
     condition: Node
     body: list
