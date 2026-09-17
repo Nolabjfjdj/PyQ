@@ -46,15 +46,9 @@ class DictLiteral(Node):
 
 
 @dataclass
-class ListAccess(Node):
-    list_node: Node
+class IndexAccess(Node):
+    target: Node
     index: Node
-
-
-@dataclass
-class DictAccess(Node):
-    dict_node: Node
-    key: Node
 
 
 @dataclass
