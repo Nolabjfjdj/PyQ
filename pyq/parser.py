@@ -569,14 +569,19 @@ class Parser:
 
         elements = []
 
+        self.skip_newlines()
+
         if self.current().type != "RBRACKET":
             while True:
                 elements.append(self.parse_expression())
+
+                self.skip_newlines()
 
                 if self.current().type != "COMMA":
                     break
 
                 self.advance()
+                self.skip_newlines()
 
         self.expect("RBRACKET")
 
@@ -587,20 +592,29 @@ class Parser:
 
         entries = []
 
+        self.skip_newlines()
+
         if self.current().type != "RBRACE":
             while True:
                 key = self.parse_expression()
 
+                self.skip_newlines()
+
                 self.expect("COLON")
+
+                self.skip_newlines()
 
                 value = self.parse_expression()
 
                 entries.append((key, value))
 
+                self.skip_newlines()
+
                 if self.current().type != "COMMA":
                     break
 
                 self.advance()
+                self.skip_newlines()
 
         self.expect("RBRACE")
 
