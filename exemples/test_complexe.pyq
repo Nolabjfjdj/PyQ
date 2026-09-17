@@ -1,0 +1,25 @@
+nom = "Nolan"
+age = 14
+score = 0
+
+afficher("Bonjour")
+afficher(nom)
+
+si age >= 13:
+    afficher("Tu peux commencer")
+
+    score = 10
+
+    tantque score <= 50:
+        afficher(score)
+
+        si score == 30:
+            afficher("Milieu du programme")
+
+        score = score + 10
+
+sinon:
+    afficher("Trop jeune")
+
+afficher("Programme terminé")
+afficher(score)
