@@ -3,8 +3,11 @@ from .ast import (
     NumberLiteral,
     BooleanLiteral,
     Identifier,
+    ListLiteral,
+    ListAccess,
     FunctionCall,
     VariableAssignment,
+    ListAssignment,
     BinaryOperation,
     Comparison,
     LogicalOperation,
@@ -26,6 +29,9 @@ class Interpreter:
         if isinstance(statement, VariableAssignment):
             return self.execute_assignment(statement)
 
+        if isinstance(statement, ListAssignment):
+            return self.execute_list_assignment(statement)
+
         if isinstance(statement, FunctionCall):
             return self.execute_function_call(statement)
 
@@ -42,6 +48,28 @@ class Interpreter:
     def execute_assignment(self, statement):
         value = self.evaluate(statement.value)
         self.variables[statement.name] = value
+
+    def execute_list_assignment(self, statement):
+        list_value = self.evaluate(statement.list_node)
+        index = self.evaluate(statement.index)
+        value = self.evaluate(statement.value)
+
+        if not isinstance(list_value, list):
+            raise RuntimeError(
+                "La valeur ciblée n'est pas une liste"
+            )
+
+        if not isinstance(index, int):
+            raise RuntimeError(
+                "L'index d'une liste doit être un nombre entier"
+            )
+
+        try:
+            list_value[index] = value
+        except IndexError:
+            raise RuntimeError(
+                f"Index de liste hors limites : {index}"
+            )
 
     def execute_function_call(self, statement):
         if statement.name == "afficher":
@@ -94,6 +122,15 @@ class Interpreter:
 
             return self.variables[node.name]
 
+        if isinstance(node, ListLiteral):
+            return [
+                self.evaluate(element)
+                for element in node.elements
+            ]
+
+        if isinstance(node, ListAccess):
+            return self.evaluate_list_access(node)
+
         if isinstance(node, BinaryOperation):
             return self.evaluate_binary_operation(node)
 
@@ -109,6 +146,27 @@ class Interpreter:
         raise RuntimeError(
             f"Expression inconnue : {type(node).__name__}"
         )
+
+    def evaluate_list_access(self, node):
+        list_value = self.evaluate(node.list_node)
+        index = self.evaluate(node.index)
+
+        if not isinstance(list_value, list):
+            raise RuntimeError(
+                "La valeur ciblée n'est pas une liste"
+            )
+
+        if not isinstance(index, int):
+            raise RuntimeError(
+                "L'index d'une liste doit être un nombre entier"
+            )
+
+        try:
+            return list_value[index]
+        except IndexError:
+            raise RuntimeError(
+                f"Index de liste hors limites : {index}"
+            )
 
     def evaluate_binary_operation(self, node):
         left = self.evaluate(node.left)
