@@ -17,12 +17,17 @@ class StringLiteral(Node):
 
 @dataclass
 class NumberLiteral(Node):
-    value: int
+    value: int | float
 
 
 @dataclass
 class BooleanLiteral(Node):
     value: bool
+
+
+@dataclass
+class NullLiteral(Node):
+    pass
 
 
 @dataclass
