@@ -1,0 +1,4 @@
+age = 14
+
+si age > 13:
+    afficher("Bienvenue")
