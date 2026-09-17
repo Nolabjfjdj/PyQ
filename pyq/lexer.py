@@ -86,7 +86,6 @@ class Lexer:
                 break
 
             if char == '"':
-                start = i
                 i += 1
                 value = ""
 
@@ -206,6 +205,8 @@ class Lexer:
                 ")": "RPAREN",
                 "[": "LBRACKET",
                 "]": "RBRACKET",
+                "{": "LBRACE",
+                "}": "RBRACE",
                 ",": "COMMA",
             }
 
