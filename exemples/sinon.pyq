@@ -1,0 +1,6 @@
+age = 10
+
+si age > 13:
+    afficher("Bienvenue")
+sinon:
+    afficher("Trop jeune")
