@@ -1,0 +1,116 @@
+fonction afficher_ligne():
+    afficher("--------------------")
+
+fonction maximum(a, b):
+    si a >= b:
+        retourner a
+    sinon:
+        retourner b
+
+fonction minimum(a, b):
+    si a <= b:
+        retourner a
+    sinon:
+        retourner b
+
+fonction somme_liste(nombres):
+    total = 0
+    index = 0
+
+    tantque index < 5:
+        total = total + nombres[index]
+        index = index + 1
+
+    retourner total
+
+fonction compter_superieurs(nombres, limite):
+    compteur = 0
+    index = 0
+
+    tantque index < 5:
+        si nombres[index] > limite:
+            compteur = compteur + 1
+
+        index = index + 1
+
+    retourner compteur
+
+fonction calculer_score(age, bonus):
+    score = age * 10
+
+    si age >= 13 et age <= 17:
+        score = score + bonus
+
+    retourner score
+
+fonction est_valide(age, score):
+    retourner age >= 13 et score >= 100
+
+fonction analyser(nom, age, scores):
+    afficher_ligne()
+
+    afficher("Analyse de")
+    afficher(nom)
+
+    score_total = somme_liste(scores)
+
+    score_max = maximum(scores[0], scores[1])
+    score_max = maximum(score_max, scores[2])
+    score_max = maximum(score_max, scores[3])
+    score_max = maximum(score_max, scores[4])
+
+    score_min = minimum(scores[0], scores[1])
+    score_min = minimum(score_min, scores[2])
+    score_min = minimum(score_min, scores[3])
+    score_min = minimum(score_min, scores[4])
+
+    afficher("Somme")
+    afficher(score_total)
+
+    afficher("Maximum")
+    afficher(score_max)
+
+    afficher("Minimum")
+    afficher(score_min)
+
+    afficher("Scores > 10")
+    afficher(compter_superieurs(scores, 10))
+
+    score_final = calculer_score(age, 50)
+
+    afficher("Score final")
+    afficher(score_final)
+
+    si est_valide(age, score_final):
+        afficher("Profil valide")
+    sinon:
+        afficher("Profil invalide")
+
+    afficher_ligne()
+
+nom = "Nolan"
+age = 14
+
+scores = [10, 20, 15, 8, 30]
+
+analyser(nom, age, scores)
+
+autres_scores = [5, 25, 40, 2, 18]
+
+analyser("PyQ", 16, autres_scores)
+
+total = somme_liste(scores)
+
+si total > 50 et total < 100:
+    afficher("Somme dans la plage")
+
+si non faux:
+    afficher("Le système logique fonctionne")
+
+resultat = maximum(somme_liste(scores), somme_liste(autres_scores))
+
+afficher("Plus grande somme")
+afficher(resultat)
+
+afficher_ligne()
+afficher("Fin du stress test")
