@@ -39,6 +39,10 @@ class Parser:
         self.position += 1
         return token
 
+    def mark_line(self, node, line):
+        node.line = line
+        return node
+
     def error(self, message, token=None):
         if token is None:
             token = self.current()
@@ -85,19 +89,24 @@ class Parser:
             self.error("instruction invalide", token)
 
         if token.value == "si":
-            return self.parse_if()
+            statement = self.parse_if()
+            return self.mark_line(statement, token.position)
 
         if token.value == "tantque":
-            return self.parse_while()
+            statement = self.parse_while()
+            return self.mark_line(statement, token.position)
 
         if token.value == "pour":
-            return self.parse_for()
+            statement = self.parse_for()
+            return self.mark_line(statement, token.position)
 
         if token.value == "fonction":
-            return self.parse_function_definition()
+            statement = self.parse_function_definition()
+            return self.mark_line(statement, token.position)
 
         if token.value == "retourner":
-            return self.parse_return()
+            statement = self.parse_return()
+            return self.mark_line(statement, token.position)
 
         if token.value == "interrompre":
             self.advance()
@@ -105,7 +114,10 @@ class Parser:
             if self.current().type == "NEWLINE":
                 self.advance()
 
-            return BreakStatement()
+            return self.mark_line(
+                BreakStatement(),
+                token.position
+            )
 
         if token.value == "continuer":
             self.advance()
@@ -113,7 +125,10 @@ class Parser:
             if self.current().type == "NEWLINE":
                 self.advance()
 
-            return ContinueStatement()
+            return self.mark_line(
+                ContinueStatement(),
+                token.position
+            )
 
         if token.value == "sinon":
             self.error(
@@ -138,7 +153,10 @@ class Parser:
         if self.current().type == "NEWLINE":
             self.advance()
 
-        return statement
+        return self.mark_line(
+            statement,
+            token.position
+        )
 
     def parse_function_definition(self):
         self.expect("IDENTIFIER")
