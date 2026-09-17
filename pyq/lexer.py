@@ -12,14 +12,81 @@ class Lexer:
     def __init__(self, source: str):
         self.source = source
         self.position = 0
+        self.indent_stack = [0]
 
     def tokenize(self):
         tokens = []
+        at_line_start = True
 
         while self.position < len(self.source):
             char = self.source[self.position]
 
+            if at_line_start:
+                if char == "\n":
+                    tokens.append(Token("NEWLINE", "\n", self.position))
+                    self.position += 1
+                    continue
+
+                indent = 0
+
+                while self.position < len(self.source):
+                    char = self.source[self.position]
+
+                    if char == " ":
+                        indent += 1
+                        self.position += 1
+                    elif char == "\t":
+                        indent += 4
+                        self.position += 1
+                    else:
+                        break
+
+                if self.position >= len(self.source):
+                    break
+
+                if self.source[self.position] == "\n":
+                    tokens.append(
+                        Token("NEWLINE", "\n", self.position)
+                    )
+                    self.position += 1
+                    continue
+
+                current_indent = self.indent_stack[-1]
+
+                if indent > current_indent:
+                    self.indent_stack.append(indent)
+                    tokens.append(
+                        Token("INDENT", str(indent), self.position)
+                    )
+
+                elif indent < current_indent:
+                    while indent < self.indent_stack[-1]:
+                        self.indent_stack.pop()
+                        tokens.append(
+                            Token("DEDENT", str(indent), self.position)
+                        )
+
+                    if indent != self.indent_stack[-1]:
+                        raise SyntaxError(
+                            f"Indentation invalide à la position {self.position}"
+                        )
+
+                at_line_start = False
+                continue
+
             if char.isspace():
+                if char == "\n":
+                    tokens.append(
+                        Token("NEWLINE", "\n", self.position)
+                    )
+                    self.position += 1
+                    at_line_start = True
+                else:
+                    self.position += 1
+                continue
+
+            if char == ":":
+                tokens.append(Token("COLON", ":", self.position))
                 self.position += 1
                 continue
 
@@ -35,16 +102,22 @@ class Lexer:
 
             if char == "=":
                 if self._peek("="):
-                    tokens.append(Token("EQUALS_EQUALS", "==", self.position))
+                    tokens.append(
+                        Token("EQUALS_EQUALS", "==", self.position)
+                    )
                     self.position += 2
                 else:
-                    tokens.append(Token("EQUALS", "=", self.position))
+                    tokens.append(
+                        Token("EQUALS", "=", self.position)
+                    )
                     self.position += 1
                 continue
 
             if char == "!":
                 if self._peek("="):
-                    tokens.append(Token("NOT_EQUALS", "!=", self.position))
+                    tokens.append(
+                        Token("NOT_EQUALS", "!=", self.position)
+                    )
                     self.position += 2
                     continue
 
@@ -54,19 +127,27 @@ class Lexer:
 
             if char == ">":
                 if self._peek("="):
-                    tokens.append(Token("GREATER_EQUALS", ">=", self.position))
+                    tokens.append(
+                        Token("GREATER_EQUALS", ">=", self.position)
+                    )
                     self.position += 2
                 else:
-                    tokens.append(Token("GREATER", ">", self.position))
+                    tokens.append(
+                        Token("GREATER", ">", self.position)
+                    )
                     self.position += 1
                 continue
 
             if char == "<":
                 if self._peek("="):
-                    tokens.append(Token("LESS_EQUALS", "<=", self.position))
+                    tokens.append(
+                        Token("LESS_EQUALS", "<=", self.position)
+                    )
                     self.position += 2
                 else:
-                    tokens.append(Token("LESS", "<", self.position))
+                    tokens.append(
+                        Token("LESS", "<", self.position)
+                    )
                     self.position += 1
                 continue
 
@@ -106,7 +187,12 @@ class Lexer:
                 f"Caractère inattendu à la position {self.position}: {char}"
             )
 
+        while len(self.indent_stack) > 1:
+            self.indent_stack.pop()
+            tokens.append(Token("DEDENT", "", self.position))
+
         tokens.append(Token("EOF", "", self.position))
+
         return tokens
 
     def _peek(self, expected):
