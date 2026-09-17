@@ -8,6 +8,8 @@ from .ast import (
     VariableAssignment,
     BinaryOperation,
     Comparison,
+    LogicalOperation,
+    UnaryOperation,
     IfStatement,
     WhileStatement,
 )
@@ -182,10 +184,48 @@ class Parser:
         return FunctionCall(name, argument)
 
     def parse_expression(self):
-        return self.parse_comparison()
+        return self.parse_or()
+
+    def parse_or(self):
+        expression = self.parse_and()
+
+        while (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "ou"
+        ):
+            self.advance()
+
+            right = self.parse_and()
+
+            expression = LogicalOperation(
+                expression,
+                "ou",
+                right
+            )
+
+        return expression
+
+    def parse_and(self):
+        expression = self.parse_comparison()
+
+        while (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "et"
+        ):
+            self.advance()
+
+            right = self.parse_comparison()
+
+            expression = LogicalOperation(
+                expression,
+                "et",
+                right
+            )
+
+        return expression
 
     def parse_comparison(self):
-        expression = self.parse_addition()
+        expression = self.parse_unary()
 
         comparison_operators = {
             "EQUALS_EQUALS",
@@ -198,7 +238,7 @@ class Parser:
 
         while self.current().type in comparison_operators:
             operator = self.advance().value
-            right = self.parse_addition()
+            right = self.parse_unary()
 
             expression = Comparison(
                 expression,
@@ -207,6 +247,22 @@ class Parser:
             )
 
         return expression
+
+    def parse_unary(self):
+        if (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "non"
+        ):
+            self.advance()
+
+            operand = self.parse_unary()
+
+            return UnaryOperation(
+                "non",
+                operand
+            )
+
+        return self.parse_addition()
 
     def parse_addition(self):
         expression = self.parse_multiplication()
