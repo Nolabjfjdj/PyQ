@@ -31,6 +31,17 @@ class Identifier(Node):
 
 
 @dataclass
+class ListLiteral(Node):
+    elements: list
+
+
+@dataclass
+class ListAccess(Node):
+    list_node: Node
+    index: Node
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     argument: Node
@@ -39,6 +50,13 @@ class FunctionCall(Node):
 @dataclass
 class VariableAssignment(Node):
     name: str
+    value: Node
+
+
+@dataclass
+class ListAssignment(Node):
+    list_node: Node
+    index: Node
     value: Node
 
 
