@@ -5,10 +5,12 @@ from .ast import (
     NullLiteral,
     Identifier,
     ListLiteral,
+    DictLiteral,
     ListAccess,
+    DictAccess,
     FunctionCall,
     VariableAssignment,
-    ListAssignment,
+    IndexAssignment,
     FunctionDefinition,
     ReturnStatement,
     BinaryOperation,
@@ -57,8 +59,8 @@ class Interpreter:
         if isinstance(statement, VariableAssignment):
             return self.execute_assignment(statement)
 
-        if isinstance(statement, ListAssignment):
-            return self.execute_list_assignment(statement)
+        if isinstance(statement, IndexAssignment):
+            return self.execute_index_assignment(statement)
 
         if isinstance(statement, FunctionCall):
             return self.execute_function_call(statement)
@@ -107,28 +109,39 @@ class Interpreter:
         else:
             self.variables[statement.name] = value
 
-    def execute_list_assignment(self, statement):
-        list_value = self.evaluate(statement.list_node)
+    def execute_index_assignment(self, statement):
+        target = self.evaluate(statement.target)
         index = self.evaluate(statement.index)
         value = self.evaluate(statement.value)
 
-        if not isinstance(list_value, list):
-            raise RuntimeError(
-                "La valeur ciblée n'est pas une liste"
-            )
+        if isinstance(target, list):
+            if not isinstance(index, int):
+                raise RuntimeError(
+                    "L'index d'une liste doit être un nombre entier"
+                )
 
-        if not isinstance(index, int):
-            raise RuntimeError(
-                "L'index d'une liste doit être un nombre entier"
-            )
+            try:
+                target[index] = value
+            except IndexError:
+                raise RuntimeError(
+                    f"Index de liste hors limites : {index}"
+                )
 
-        try:
-            list_value[index] = value
+            return
 
-        except IndexError:
-            raise RuntimeError(
-                f"Index de liste hors limites : {index}"
-            )
+        if isinstance(target, dict):
+            try:
+                target[index] = value
+            except TypeError:
+                raise RuntimeError(
+                    "La clé du dictionnaire n'est pas valide"
+                )
+
+            return
+
+        raise RuntimeError(
+            "La valeur ciblée n'est ni une liste ni un dictionnaire"
+        )
 
     def execute_function_call(self, statement):
         if statement.name == "afficher":
@@ -272,8 +285,14 @@ class Interpreter:
                 for element in node.elements
             ]
 
+        if isinstance(node, DictLiteral):
+            return self.evaluate_dict_literal(node)
+
         if isinstance(node, ListAccess):
             return self.evaluate_list_access(node)
+
+        if isinstance(node, DictAccess):
+            return self.evaluate_dict_access(node)
 
         if isinstance(node, FunctionCall):
             return self.call_function(
@@ -311,6 +330,22 @@ class Interpreter:
             f"Variable inconnue : {name}"
         )
 
+    def evaluate_dict_literal(self, node):
+        result = {}
+
+        for key_node, value_node in node.entries:
+            key = self.evaluate(key_node)
+            value = self.evaluate(value_node)
+
+            try:
+                result[key] = value
+            except TypeError:
+                raise RuntimeError(
+                    "La clé du dictionnaire n'est pas valide"
+                )
+
+        return result
+
     def evaluate_list_access(self, node):
         list_value = self.evaluate(node.list_node)
         index = self.evaluate(node.index)
@@ -331,6 +366,26 @@ class Interpreter:
         except IndexError:
             raise RuntimeError(
                 f"Index de liste hors limites : {index}"
+            )
+
+    def evaluate_dict_access(self, node):
+        dict_value = self.evaluate(node.dict_node)
+        key = self.evaluate(node.key)
+
+        if not isinstance(dict_value, dict):
+            raise RuntimeError(
+                "La valeur ciblée n'est pas un dictionnaire"
+            )
+
+        try:
+            return dict_value[key]
+        except KeyError:
+            raise RuntimeError(
+                f"Clé de dictionnaire inconnue : {key}"
+            )
+        except TypeError:
+            raise RuntimeError(
+                "La clé du dictionnaire n'est pas valide"
             )
 
     def evaluate_binary_operation(self, node):
