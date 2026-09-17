@@ -1,10 +1,12 @@
 from .ast import (
     StringLiteral,
     NumberLiteral,
+    BooleanLiteral,
     Identifier,
     FunctionCall,
     VariableAssignment,
     BinaryOperation,
+    Comparison,
 )
 
 
@@ -34,7 +36,14 @@ class Interpreter:
     def execute_function_call(self, statement):
         if statement.name == "afficher":
             value = self.evaluate(statement.argument)
-            print(value)
+
+            if value is True:
+                print("vrai")
+            elif value is False:
+                print("faux")
+            else:
+                print(value)
+
             return
 
         raise RuntimeError(
@@ -48,6 +57,9 @@ class Interpreter:
         if isinstance(node, NumberLiteral):
             return node.value
 
+        if isinstance(node, BooleanLiteral):
+            return node.value
+
         if isinstance(node, Identifier):
             if node.name not in self.variables:
                 raise RuntimeError(
@@ -58,6 +70,9 @@ class Interpreter:
 
         if isinstance(node, BinaryOperation):
             return self.evaluate_binary_operation(node)
+
+        if isinstance(node, Comparison):
+            return self.evaluate_comparison(node)
 
         raise RuntimeError(
             f"Expression inconnue : {type(node).__name__}"
@@ -78,12 +93,36 @@ class Interpreter:
 
         if node.operator == "/":
             if right == 0:
-                raise RuntimeError(
-                    "Division par zéro"
-                )
+                raise RuntimeError("Division par zéro")
 
             return left / right
 
         raise RuntimeError(
             f"Opérateur inconnu : {node.operator}"
+        )
+
+    def evaluate_comparison(self, node):
+        left = self.evaluate(node.left)
+        right = self.evaluate(node.right)
+
+        if node.operator == "==":
+            return left == right
+
+        if node.operator == "!=":
+            return left != right
+
+        if node.operator == ">":
+            return left > right
+
+        if node.operator == "<":
+            return left < right
+
+        if node.operator == ">=":
+            return left >= right
+
+        if node.operator == "<=":
+            return left <= right
+
+        raise RuntimeError(
+            f"Comparaison inconnue : {node.operator}"
         )
