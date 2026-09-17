@@ -16,6 +16,7 @@ from .ast import (
     UnaryOperation,
     IfStatement,
     WhileStatement,
+    ForStatement,
 )
 
 
@@ -73,6 +74,9 @@ class Interpreter:
 
         if isinstance(statement, WhileStatement):
             return self.execute_while(statement)
+
+        if isinstance(statement, ForStatement):
+            return self.execute_for(statement)
 
         raise RuntimeError(
             f"Instruction inconnue : {type(statement).__name__}"
@@ -192,6 +196,23 @@ class Interpreter:
 
     def execute_while(self, statement):
         while self.evaluate(statement.condition):
+            for instruction in statement.body:
+                self.execute_statement(instruction)
+
+    def execute_for(self, statement):
+        iterable = self.evaluate(statement.iterable)
+
+        if not isinstance(iterable, list):
+            raise RuntimeError(
+                "La valeur parcourue par 'pour' doit être une liste"
+            )
+
+        for value in iterable:
+            if self.local_scopes:
+                self.local_scopes[-1][statement.variable] = value
+            else:
+                self.variables[statement.variable] = value
+
             for instruction in statement.body:
                 self.execute_statement(instruction)
 
