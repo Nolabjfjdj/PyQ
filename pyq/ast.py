@@ -61,7 +61,8 @@ class IfStatement(Node):
     condition: Node
     body: list
     else_body: list | None = None
-    
+
+
 @dataclass
 class WhileStatement(Node):
     condition: Node
