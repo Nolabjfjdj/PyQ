@@ -8,6 +8,7 @@ from .ast import (
     BinaryOperation,
     Comparison,
     IfStatement,
+    WhileStatement,
 )
 
 
@@ -28,6 +29,9 @@ class Interpreter:
 
         if isinstance(statement, IfStatement):
             return self.execute_if(statement)
+
+        if isinstance(statement, WhileStatement):
+            return self.execute_while(statement)
 
         raise RuntimeError(
             f"Instruction inconnue : {type(statement).__name__}"
@@ -63,6 +67,11 @@ class Interpreter:
 
         elif statement.else_body is not None:
             for instruction in statement.else_body:
+                self.execute_statement(instruction)
+
+    def execute_while(self, statement):
+        while self.evaluate(statement.condition):
+            for instruction in statement.body:
                 self.execute_statement(instruction)
 
     def evaluate(self, node):
