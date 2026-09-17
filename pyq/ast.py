@@ -2,7 +2,8 @@ from dataclasses import dataclass
 
 
 class Node:
-    line = None
+    def __init__(self):
+        self.line = None
 
 
 @dataclass
