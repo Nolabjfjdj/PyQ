@@ -1,0 +1,26 @@
+fonction saluer(nom):
+    afficher("Bonjour")
+    afficher(nom)
+
+saluer("Nolan")
+
+
+fonction additionner(a, b):
+    retourner a + b
+
+resultat = additionner(10, 5)
+
+afficher(resultat)
+
+
+fonction est_adulte(age):
+    retourner age >= 18
+
+afficher(est_adulte(14))
+afficher(est_adulte(20))
+
+
+fonction dire_bonjour():
+    afficher("Salut depuis une fonction")
+
+dire_bonjour()
