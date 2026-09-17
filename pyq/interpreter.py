@@ -7,6 +7,8 @@ from .ast import (
     VariableAssignment,
     BinaryOperation,
     Comparison,
+    LogicalOperation,
+    UnaryOperation,
     IfStatement,
     WhileStatement,
 )
@@ -98,6 +100,12 @@ class Interpreter:
         if isinstance(node, Comparison):
             return self.evaluate_comparison(node)
 
+        if isinstance(node, LogicalOperation):
+            return self.evaluate_logical_operation(node)
+
+        if isinstance(node, UnaryOperation):
+            return self.evaluate_unary_operation(node)
+
         raise RuntimeError(
             f"Expression inconnue : {type(node).__name__}"
         )
@@ -149,4 +157,33 @@ class Interpreter:
 
         raise RuntimeError(
             f"Comparaison inconnue : {node.operator}"
+        )
+
+    def evaluate_logical_operation(self, node):
+        left = self.evaluate(node.left)
+
+        if node.operator == "et":
+            if not left:
+                return False
+
+            return bool(self.evaluate(node.right))
+
+        if node.operator == "ou":
+            if left:
+                return True
+
+            return bool(self.evaluate(node.right))
+
+        raise RuntimeError(
+            f"Opérateur logique inconnu : {node.operator}"
+        )
+
+    def evaluate_unary_operation(self, node):
+        value = self.evaluate(node.operand)
+
+        if node.operator == "non":
+            return not value
+
+        raise RuntimeError(
+            f"Opérateur unaire inconnu : {node.operator}"
         )
