@@ -17,6 +17,7 @@ from .ast import (
     UnaryOperation,
     IfStatement,
     WhileStatement,
+    ForStatement,
 )
 
 
@@ -76,6 +77,9 @@ class Parser:
 
         if token.value == "tantque":
             return self.parse_while()
+
+        if token.value == "pour":
+            return self.parse_for()
 
         if token.value == "fonction":
             return self.parse_function_definition()
@@ -243,6 +247,44 @@ class Parser:
 
         return WhileStatement(
             condition,
+            body
+        )
+
+    def parse_for(self):
+        self.expect("IDENTIFIER")
+
+        variable = self.expect("IDENTIFIER").value
+
+        if (
+            self.current().type != "IDENTIFIER"
+            or self.current().value != "dans"
+        ):
+            raise SyntaxError(
+                f"Attendu 'dans', obtenu {self.current().value}"
+            )
+
+        self.advance()
+
+        iterable = self.parse_expression()
+
+        self.expect("COLON")
+        self.expect("NEWLINE")
+        self.expect("INDENT")
+
+        body = []
+
+        self.skip_newlines()
+
+        while self.current().type not in ("DEDENT", "EOF"):
+            body.append(self.parse_statement())
+            self.skip_newlines()
+
+        if self.current().type == "DEDENT":
+            self.advance()
+
+        return ForStatement(
+            variable,
+            iterable,
             body
         )
 
