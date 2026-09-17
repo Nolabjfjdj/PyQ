@@ -54,3 +54,10 @@ class Comparison(Node):
     left: Node
     operator: str
     right: Node
+
+
+@dataclass
+class IfStatement(Node):
+    condition: Node
+    body: list
+    else_body: list | None = None
