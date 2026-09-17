@@ -39,12 +39,21 @@ class Parser:
         self.position += 1
         return token
 
+    def error(self, message, token=None):
+        if token is None:
+            token = self.current()
+
+        raise SyntaxError(
+            f"Erreur de syntaxe à la ligne {token.position} : {message}"
+        )
+
     def expect(self, token_type):
         token = self.current()
 
         if token.type != token_type:
-            raise SyntaxError(
-                f"Attendu {token_type}, obtenu {token.type}"
+            self.error(
+                f"attendu {token_type}, obtenu {token.type}",
+                token
             )
 
         return self.advance()
@@ -73,9 +82,7 @@ class Parser:
         token = self.current()
 
         if token.type != "IDENTIFIER":
-            raise SyntaxError(
-                f"Instruction invalide à la position {token.position}"
-            )
+            self.error("instruction invalide", token)
 
         if token.value == "si":
             return self.parse_if()
@@ -109,8 +116,9 @@ class Parser:
             return ContinueStatement()
 
         if token.value == "sinon":
-            raise SyntaxError(
-                f"'sinon' inattendu à la position {token.position}"
+            self.error(
+                "'sinon' inattendu",
+                token
             )
 
         next_token = self.tokens[self.position + 1]
@@ -283,8 +291,8 @@ class Parser:
             self.current().type != "IDENTIFIER"
             or self.current().value != "dans"
         ):
-            raise SyntaxError(
-                f"Attendu 'dans', obtenu {self.current().value}"
+            self.error(
+                f"attendu 'dans', obtenu {self.current().value}"
             )
 
         self.advance()
@@ -549,8 +557,9 @@ class Parser:
 
             return self.parse_postfix(expression)
 
-        raise SyntaxError(
-            f"Expression invalide à la position {token.position}"
+        self.error(
+            "expression invalide",
+            token
         )
 
     def parse_postfix(self, expression):
