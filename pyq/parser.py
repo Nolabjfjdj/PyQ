@@ -9,6 +9,7 @@ from .ast import (
     BinaryOperation,
     Comparison,
     IfStatement,
+    WhileStatement,
 )
 
 
@@ -66,6 +67,14 @@ class Parser:
         if token.value == "si":
             return self.parse_if()
 
+        if token.value == "tantque":
+            return self.parse_while()
+
+        if token.value == "sinon":
+            raise SyntaxError(
+                f"'sinon' inattendu à la position {token.position}"
+            )
+
         next_token = self.tokens[self.position + 1]
 
         if next_token.type == "EQUALS":
@@ -73,7 +82,8 @@ class Parser:
         else:
             statement = self.parse_function_call()
 
-        self.expect("NEWLINE") if self.current().type == "NEWLINE" else None
+        if self.current().type == "NEWLINE":
+            self.advance()
 
         return statement
 
@@ -124,6 +134,31 @@ class Parser:
             condition,
             body,
             else_body
+        )
+
+    def parse_while(self):
+        self.expect("IDENTIFIER")
+
+        condition = self.parse_expression()
+
+        self.expect("COLON")
+        self.expect("NEWLINE")
+        self.expect("INDENT")
+
+        body = []
+
+        self.skip_newlines()
+
+        while self.current().type not in ("DEDENT", "EOF"):
+            body.append(self.parse_statement())
+            self.skip_newlines()
+
+        if self.current().type == "DEDENT":
+            self.advance()
+
+        return WhileStatement(
+            condition,
+            body
         )
 
     def parse_assignment(self):
