@@ -6,10 +6,12 @@ from .ast import (
     NullLiteral,
     Identifier,
     ListLiteral,
+    DictLiteral,
     ListAccess,
+    DictAccess,
     FunctionCall,
     VariableAssignment,
-    ListAssignment,
+    IndexAssignment,
     FunctionDefinition,
     ReturnStatement,
     BinaryOperation,
@@ -117,7 +119,7 @@ class Parser:
             statement = self.parse_assignment()
 
         elif next_token.type == "LBRACKET":
-            statement = self.parse_list_assignment()
+            statement = self.parse_index_assignment()
 
         else:
             statement = self.parse_function_call()
@@ -316,8 +318,10 @@ class Parser:
 
         return VariableAssignment(name, value)
 
-    def parse_list_assignment(self):
-        list_name = self.expect("IDENTIFIER").value
+    def parse_index_assignment(self):
+        name = self.expect("IDENTIFIER").value
+
+        target = Identifier(name)
 
         self.expect("LBRACKET")
 
@@ -328,8 +332,8 @@ class Parser:
 
         value = self.parse_expression()
 
-        return ListAssignment(
-            Identifier(list_name),
+        return IndexAssignment(
+            target,
             index,
             value
         )
@@ -528,15 +532,24 @@ class Parser:
 
                 self.expect("RBRACKET")
 
-                expression = ListAccess(
-                    expression,
-                    index
-                )
+                if isinstance(expression, Identifier):
+                    expression = ListAccess(
+                        expression,
+                        index
+                    )
+                else:
+                    expression = DictAccess(
+                        expression,
+                        index
+                    )
 
             return expression
 
         if token.type == "LBRACKET":
             return self.parse_list()
+
+        if token.type == "LBRACE":
+            return self.parse_dict()
 
         if token.type == "LPAREN":
             self.advance()
@@ -568,3 +581,27 @@ class Parser:
         self.expect("RBRACKET")
 
         return ListLiteral(elements)
+
+    def parse_dict(self):
+        self.expect("LBRACE")
+
+        entries = []
+
+        if self.current().type != "RBRACE":
+            while True:
+                key = self.parse_expression()
+
+                self.expect("COLON")
+
+                value = self.parse_expression()
+
+                entries.append((key, value))
+
+                if self.current().type != "COMMA":
+                    break
+
+                self.advance()
+
+        self.expect("RBRACE")
+
+        return DictLiteral(entries)
