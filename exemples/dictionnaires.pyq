@@ -1,0 +1,35 @@
+personne = {
+    "nom": "Nolan",
+    "age": 14
+}
+
+afficher(personne["nom"])
+afficher(personne["age"])
+
+personne["age"] = 15
+
+afficher(personne["age"])
+
+profil = {
+    "nom": "PyQ",
+    "createur": {
+        "nom": "LaBanane415",
+        "annee": 2026
+    }
+}
+
+afficher(profil["createur"]["nom"])
+afficher(profil["createur"]["annee"])
+
+scores = {
+    "maths": 18,
+    "francais": 16,
+    "anglais": 19
+}
+
+afficher(scores["maths"])
+afficher(scores["francais"])
+
+scores["maths"] = 20
+
+afficher(scores["maths"])
