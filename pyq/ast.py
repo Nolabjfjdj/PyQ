@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 
 class Node:
-    pass
+    line = None
 
 
 @dataclass
@@ -143,4 +143,4 @@ class BreakStatement(Node):
 
 @dataclass
 class ContinueStatement(Node):
-    pass 
+    pass
