@@ -33,8 +33,17 @@ class Lexer:
                 self.position += 1
                 continue
 
+            if char == "=":
+                tokens.append(Token("EQUALS", "=", self.position))
+                self.position += 1
+                continue
+
             if char == '"':
                 tokens.append(self._read_string())
+                continue
+
+            if char.isdigit():
+                tokens.append(self._read_number())
                 continue
 
             if char.isalpha() or char == "_":
@@ -65,6 +74,19 @@ class Lexer:
             self.position += 1
 
         raise SyntaxError("Chaîne de caractères non terminée")
+
+    def _read_number(self):
+        start = self.position
+
+        while (
+            self.position < len(self.source)
+            and self.source[self.position].isdigit()
+        ):
+            self.position += 1
+
+        value = self.source[start:self.position]
+
+        return Token("NUMBER", value, start)
 
     def _read_identifier(self):
         start = self.position
