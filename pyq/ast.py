@@ -21,6 +21,11 @@ class NumberLiteral(Node):
 
 
 @dataclass
+class BooleanLiteral(Node):
+    value: bool
+
+
+@dataclass
 class Identifier(Node):
     name: str
 
@@ -39,6 +44,13 @@ class VariableAssignment(Node):
 
 @dataclass
 class BinaryOperation(Node):
+    left: Node
+    operator: str
+    right: Node
+
+
+@dataclass
+class Comparison(Node):
     left: Node
     operator: str
     right: Node
