@@ -13,6 +13,7 @@ class Lexer:
         self.source = source
         self.tokens = []
         self.indentation_stack = [0]
+        self.bracket_depth = 0
 
     def tokenize(self):
         lines = self.source.splitlines()
@@ -21,49 +22,58 @@ class Lexer:
             stripped = line.lstrip(" ")
 
             if not stripped:
-                self.tokens.append(
-                    Token("NEWLINE", position=line_number)
-                )
+                if self.bracket_depth == 0:
+                    self.tokens.append(
+                        Token("NEWLINE", position=line_number)
+                    )
                 continue
 
             if stripped.startswith("#"):
-                self.tokens.append(
-                    Token("NEWLINE", position=line_number)
-                )
+                if self.bracket_depth == 0:
+                    self.tokens.append(
+                        Token("NEWLINE", position=line_number)
+                    )
                 continue
 
             indentation = len(line) - len(stripped)
 
-            if indentation > self.indentation_stack[-1]:
-                self.indentation_stack.append(indentation)
-                self.tokens.append(
-                    Token("INDENT", position=line_number)
-                )
-
-            elif indentation < self.indentation_stack[-1]:
-                while (
-                    indentation < self.indentation_stack[-1]
-                ):
-                    self.indentation_stack.pop()
+            if self.bracket_depth == 0:
+                if indentation > self.indentation_stack[-1]:
+                    self.indentation_stack.append(indentation)
                     self.tokens.append(
-                        Token("DEDENT", position=line_number)
+                        Token("INDENT", position=line_number)
                     )
 
-                if indentation != self.indentation_stack[-1]:
-                    raise SyntaxError(
-                        f"Indentation invalide à la ligne {line_number}"
-                    )
+                elif indentation < self.indentation_stack[-1]:
+                    while (
+                        indentation < self.indentation_stack[-1]
+                    ):
+                        self.indentation_stack.pop()
+                        self.tokens.append(
+                            Token("DEDENT", position=line_number)
+                        )
+
+                    if indentation != self.indentation_stack[-1]:
+                        raise SyntaxError(
+                            f"Indentation invalide à la ligne {line_number}"
+                        )
 
             self.tokenize_line(stripped, line_number)
 
-            self.tokens.append(
-                Token("NEWLINE", position=line_number)
-            )
+            if self.bracket_depth == 0:
+                self.tokens.append(
+                    Token("NEWLINE", position=line_number)
+                )
 
         while len(self.indentation_stack) > 1:
             self.indentation_stack.pop()
             self.tokens.append(
                 Token("DEDENT", position=len(lines) + 1)
+            )
+
+        if self.bracket_depth != 0:
+            raise SyntaxError(
+                "Structure entre crochets ou accolades non terminée"
             )
 
         self.tokens.append(
@@ -211,13 +221,27 @@ class Lexer:
             }
 
             if char in single_tokens:
+                token_type = single_tokens[char]
+
                 self.tokens.append(
                     Token(
-                        single_tokens[char],
+                        token_type,
                         char,
                         line_number
                     )
                 )
+
+                if char in "([{":
+                    self.bracket_depth += 1
+
+                elif char in ")]}":
+                    self.bracket_depth -= 1
+
+                    if self.bracket_depth < 0:
+                        raise SyntaxError(
+                            f"Structure fermante inattendue à la ligne {line_number}"
+                        )
+
                 i += 1
                 continue
 
