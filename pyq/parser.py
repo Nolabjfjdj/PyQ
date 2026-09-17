@@ -2,10 +2,12 @@ from .ast import (
     Program,
     StringLiteral,
     NumberLiteral,
+    BooleanLiteral,
     Identifier,
     FunctionCall,
     VariableAssignment,
     BinaryOperation,
+    Comparison,
 )
 
 
@@ -76,7 +78,31 @@ class Parser:
         return FunctionCall(name, argument)
 
     def parse_expression(self):
-        return self.parse_addition()
+        return self.parse_comparison()
+
+    def parse_comparison(self):
+        expression = self.parse_addition()
+
+        comparison_operators = {
+            "EQUALS_EQUALS",
+            "NOT_EQUALS",
+            "GREATER",
+            "LESS",
+            "GREATER_EQUALS",
+            "LESS_EQUALS",
+        }
+
+        while self.current().type in comparison_operators:
+            operator = self.advance().value
+            right = self.parse_addition()
+
+            expression = Comparison(
+                expression,
+                operator,
+                right
+            )
+
+        return expression
 
     def parse_addition(self):
         expression = self.parse_multiplication()
@@ -121,6 +147,13 @@ class Parser:
 
         if token.type == "IDENTIFIER":
             self.advance()
+
+            if token.value == "vrai":
+                return BooleanLiteral(True)
+
+            if token.value == "faux":
+                return BooleanLiteral(False)
+
             return Identifier(token.value)
 
         if token.type == "LPAREN":
