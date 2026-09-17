@@ -1,7 +1,4 @@
 a = 10
 b = 5
 
-afficher(a + b)
-afficher(a - b)
-afficher(a * b)
-afficher(a / b)
+afficher(a + b * 2)
