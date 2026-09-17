@@ -25,6 +25,13 @@ from .ast import (
 )
 
 
+class PyQRuntimeError(Exception):
+    def __init__(self, message, node=None):
+        self.message = message
+        self.node = node
+        super().__init__(message)
+
+
 class ReturnSignal(Exception):
     def __init__(self, value):
         self.value = value
@@ -56,53 +63,65 @@ class Interpreter:
             self.execute_statement(statement)
 
     def execute_statement(self, statement):
-        if isinstance(statement, VariableAssignment):
-            return self.execute_assignment(statement)
+        try:
+            if isinstance(statement, VariableAssignment):
+                return self.execute_assignment(statement)
 
-        if isinstance(statement, IndexAssignment):
-            return self.execute_index_assignment(statement)
+            if isinstance(statement, IndexAssignment):
+                return self.execute_index_assignment(statement)
 
-        if isinstance(statement, FunctionCall):
-            return self.execute_function_call(statement)
+            if isinstance(statement, FunctionCall):
+                return self.execute_function_call(statement)
 
-        if isinstance(statement, MethodCall):
-            return self.evaluate(statement)
+            if isinstance(statement, MethodCall):
+                return self.evaluate(statement)
 
-        if isinstance(statement, FunctionDefinition):
-            self.functions[statement.name] = statement
-            return
+            if isinstance(statement, FunctionDefinition):
+                self.functions[statement.name] = statement
+                return
 
-        if isinstance(statement, ReturnStatement):
-            if not self.local_scopes:
-                raise RuntimeError(
-                    "'retourner' ne peut être utilisé qu'à l'intérieur d'une fonction"
-                )
+            if isinstance(statement, ReturnStatement):
+                if not self.local_scopes:
+                    raise PyQRuntimeError(
+                        "'retourner' ne peut être utilisé qu'à l'intérieur d'une fonction",
+                        statement
+                    )
 
-            value = None
+                value = None
 
-            if statement.value is not None:
-                value = self.evaluate(statement.value)
+                if statement.value is not None:
+                    value = self.evaluate(statement.value)
 
-            raise ReturnSignal(value)
+                raise ReturnSignal(value)
 
-        if isinstance(statement, BreakStatement):
-            raise BreakSignal()
+            if isinstance(statement, BreakStatement):
+                raise BreakSignal()
 
-        if isinstance(statement, ContinueStatement):
-            raise ContinueSignal()
+            if isinstance(statement, ContinueStatement):
+                raise ContinueSignal()
 
-        if isinstance(statement, IfStatement):
-            return self.execute_if(statement)
+            if isinstance(statement, IfStatement):
+                return self.execute_if(statement)
 
-        if isinstance(statement, WhileStatement):
-            return self.execute_while(statement)
+            if isinstance(statement, WhileStatement):
+                return self.execute_while(statement)
 
-        if isinstance(statement, ForStatement):
-            return self.execute_for(statement)
+            if isinstance(statement, ForStatement):
+                return self.execute_for(statement)
 
-        raise RuntimeError(
-            f"Instruction inconnue : {type(statement).__name__}"
-        )
+            raise PyQRuntimeError(
+                f"Instruction inconnue : {type(statement).__name__}",
+                statement
+            )
+
+        except PyQRuntimeError:
+            raise
+
+        except (TypeError, ValueError, IndexError) as error:
+            raise PyQRuntimeError(
+                str(error),
+                statement
+            )
 
     def execute_assignment(self, statement):
         value = self.evaluate(statement.value)
@@ -119,15 +138,17 @@ class Interpreter:
 
         if isinstance(target, list):
             if not isinstance(index, int):
-                raise RuntimeError(
-                    "L'index d'une liste doit être un nombre entier"
+                raise PyQRuntimeError(
+                    "L'index d'une liste doit être un nombre entier",
+                    statement
                 )
 
             try:
                 target[index] = value
             except IndexError:
-                raise RuntimeError(
-                    f"Index de liste hors limites : {index}"
+                raise PyQRuntimeError(
+                    f"Index de liste hors limites : {index}",
+                    statement
                 )
 
             return
@@ -136,21 +157,24 @@ class Interpreter:
             try:
                 target[index] = value
             except TypeError:
-                raise RuntimeError(
-                    "La clé du dictionnaire n'est pas valide"
+                raise PyQRuntimeError(
+                    "La clé du dictionnaire n'est pas valide",
+                    statement
                 )
 
             return
 
-        raise RuntimeError(
-            "La valeur ciblée n'est ni une liste ni un dictionnaire"
+        raise PyQRuntimeError(
+            "La valeur ciblée n'est ni une liste ni un dictionnaire",
+            statement
         )
 
     def execute_function_call(self, statement):
         if statement.name == "afficher":
             if len(statement.arguments) != 1:
-                raise RuntimeError(
-                    "afficher() attend exactement un argument"
+                raise PyQRuntimeError(
+                    "afficher() attend exactement un argument",
+                    statement
                 )
 
             value = self.evaluate(statement.arguments[0])
@@ -161,22 +185,25 @@ class Interpreter:
 
         return self.call_function(
             statement.name,
-            statement.arguments
+            statement.arguments,
+            statement
         )
 
-    def call_function(self, name, arguments):
+    def call_function(self, name, arguments, node=None):
         if name not in self.functions:
-            raise RuntimeError(
-                f"Fonction inconnue : {name}"
+            raise PyQRuntimeError(
+                f"Fonction inconnue : {name}",
+                node
             )
 
         function = self.functions[name]
 
         if len(arguments) != len(function.parameters):
-            raise RuntimeError(
+            raise PyQRuntimeError(
                 f"La fonction {name}() attend "
                 f"{len(function.parameters)} argument(s), "
-                f"mais {len(arguments)} ont été fournis"
+                f"mais {len(arguments)} ont été fournis",
+                node
             )
 
         values = [
@@ -246,8 +273,9 @@ class Interpreter:
         iterable = self.evaluate(statement.iterable)
 
         if not isinstance(iterable, list):
-            raise RuntimeError(
-                "La valeur parcourue par 'pour' doit être une liste"
+            raise PyQRuntimeError(
+                "La valeur parcourue par 'pour' doit être une liste",
+                statement
             )
 
         for value in iterable:
@@ -280,7 +308,7 @@ class Interpreter:
             return None
 
         if isinstance(node, Identifier):
-            return self.get_variable(node.name)
+            return self.get_variable(node.name, node)
 
         if isinstance(node, ListLiteral):
             return [
@@ -300,7 +328,8 @@ class Interpreter:
         if isinstance(node, FunctionCall):
             return self.call_function(
                 node.name,
-                node.arguments
+                node.arguments,
+                node
             )
 
         if isinstance(node, BinaryOperation):
@@ -315,11 +344,12 @@ class Interpreter:
         if isinstance(node, UnaryOperation):
             return self.evaluate_unary_operation(node)
 
-        raise RuntimeError(
-            f"Expression inconnue : {type(node).__name__}"
+        raise PyQRuntimeError(
+            f"Expression inconnue : {type(node).__name__}",
+            node
         )
 
-    def get_variable(self, name):
+    def get_variable(self, name, node=None):
         if self.local_scopes:
             local_scope = self.local_scopes[-1]
 
@@ -329,8 +359,9 @@ class Interpreter:
         if name in self.variables:
             return self.variables[name]
 
-        raise RuntimeError(
-            f"Variable inconnue : {name}"
+        raise PyQRuntimeError(
+            f"Variable inconnue : {name}",
+            node
         )
 
     def evaluate_dict_literal(self, node):
@@ -343,8 +374,9 @@ class Interpreter:
             try:
                 result[key] = value
             except TypeError:
-                raise RuntimeError(
-                    "La clé du dictionnaire n'est pas valide"
+                raise PyQRuntimeError(
+                    "La clé du dictionnaire n'est pas valide",
+                    node
                 )
 
         return result
@@ -355,44 +387,51 @@ class Interpreter:
 
         if isinstance(target, list):
             if not isinstance(index, int):
-                raise RuntimeError(
-                    "L'index d'une liste doit être un nombre entier"
+                raise PyQRuntimeError(
+                    "L'index d'une liste doit être un nombre entier",
+                    node
                 )
 
             try:
                 return target[index]
             except IndexError:
-                raise RuntimeError(
-                    f"Index de liste hors limites : {index}"
+                raise PyQRuntimeError(
+                    f"Index de liste hors limites : {index}",
+                    node
                 )
 
         if isinstance(target, dict):
             try:
                 return target[index]
             except KeyError:
-                raise RuntimeError(
-                    f"Clé de dictionnaire inconnue : {index}"
+                raise PyQRuntimeError(
+                    f"Clé de dictionnaire inconnue : {index}",
+                    node
                 )
             except TypeError:
-                raise RuntimeError(
-                    "La clé du dictionnaire n'est pas valide"
+                raise PyQRuntimeError(
+                    "La clé du dictionnaire n'est pas valide",
+                    node
                 )
 
         if isinstance(target, str):
             if not isinstance(index, int):
-                raise RuntimeError(
-                    "L'index d'une chaîne doit être un nombre entier"
+                raise PyQRuntimeError(
+                    "L'index d'une chaîne doit être un nombre entier",
+                    node
                 )
 
             try:
                 return target[index]
             except IndexError:
-                raise RuntimeError(
-                    f"Index de chaîne hors limites : {index}"
+                raise PyQRuntimeError(
+                    f"Index de chaîne hors limites : {index}",
+                    node
                 )
 
-        raise RuntimeError(
-            "La valeur ciblée ne peut pas être indexée"
+        raise PyQRuntimeError(
+            "La valeur ciblée ne peut pas être indexée",
+            node
         )
 
     def execute_method_call(self, node):
@@ -401,8 +440,9 @@ class Interpreter:
         if isinstance(target, list):
             if node.name == "ajouter":
                 if len(node.arguments) != 1:
-                    raise RuntimeError(
-                        "ajouter() attend exactement un argument"
+                    raise PyQRuntimeError(
+                        "ajouter() attend exactement un argument",
+                        node
                     )
 
                 value = self.evaluate(node.arguments[0])
@@ -412,8 +452,9 @@ class Interpreter:
 
             if node.name == "retirer":
                 if len(node.arguments) != 1:
-                    raise RuntimeError(
-                        "retirer() attend exactement un argument"
+                    raise PyQRuntimeError(
+                        "retirer() attend exactement un argument",
+                        node
                     )
 
                 value = self.evaluate(node.arguments[0])
@@ -421,135 +462,164 @@ class Interpreter:
                 try:
                     target.remove(value)
                 except ValueError:
-                    raise RuntimeError(
-                        f"Valeur absente de la liste : {value}"
+                    raise PyQRuntimeError(
+                        f"Valeur absente de la liste : {value}",
+                        node
                     )
 
                 return None
 
             if node.name == "taille":
                 if len(node.arguments) != 0:
-                    raise RuntimeError(
-                        "taille() n'attend aucun argument"
+                    raise PyQRuntimeError(
+                        "taille() n'attend aucun argument",
+                        node
                     )
 
                 return len(target)
 
-            raise RuntimeError(
-                f"Méthode de liste inconnue : {node.name}"
+            raise PyQRuntimeError(
+                f"Méthode de liste inconnue : {node.name}",
+                node
             )
 
         if isinstance(target, str):
             if node.name == "taille":
                 if len(node.arguments) != 0:
-                    raise RuntimeError(
-                        "taille() n'attend aucun argument"
+                    raise PyQRuntimeError(
+                        "taille() n'attend aucun argument",
+                        node
                     )
 
                 return len(target)
 
             if node.name == "contient":
                 if len(node.arguments) != 1:
-                    raise RuntimeError(
-                        "contient() attend exactement un argument"
+                    raise PyQRuntimeError(
+                        "contient() attend exactement un argument",
+                        node
                     )
 
                 value = self.evaluate(node.arguments[0])
 
                 if not isinstance(value, str):
-                    raise RuntimeError(
-                        "contient() attend une chaîne de caractères"
+                    raise PyQRuntimeError(
+                        "contient() attend une chaîne de caractères",
+                        node
                     )
 
                 return value in target
 
             if node.name == "commence_par":
                 if len(node.arguments) != 1:
-                    raise RuntimeError(
-                        "commence_par() attend exactement un argument"
+                    raise PyQRuntimeError(
+                        "commence_par() attend exactement un argument",
+                        node
                     )
 
                 value = self.evaluate(node.arguments[0])
 
                 if not isinstance(value, str):
-                    raise RuntimeError(
-                        "commence_par() attend une chaîne de caractères"
+                    raise PyQRuntimeError(
+                        "commence_par() attend une chaîne de caractères",
+                        node
                     )
 
                 return target.startswith(value)
 
             if node.name == "finit_par":
                 if len(node.arguments) != 1:
-                    raise RuntimeError(
-                        "finit_par() attend exactement un argument"
+                    raise PyQRuntimeError(
+                        "finit_par() attend exactement un argument",
+                        node
                     )
 
                 value = self.evaluate(node.arguments[0])
 
                 if not isinstance(value, str):
-                    raise RuntimeError(
-                        "finit_par() attend une chaîne de caractères"
+                    raise PyQRuntimeError(
+                        "finit_par() attend une chaîne de caractères",
+                        node
                     )
 
                 return target.endswith(value)
 
-            raise RuntimeError(
-                f"Méthode de chaîne inconnue : {node.name}"
+            raise PyQRuntimeError(
+                f"Méthode de chaîne inconnue : {node.name}",
+                node
             )
 
-        raise RuntimeError(
-            f"Les méthodes ne sont pas disponibles pour cette valeur"
+        raise PyQRuntimeError(
+            "Les méthodes ne sont pas disponibles pour cette valeur",
+            node
         )
 
     def evaluate_binary_operation(self, node):
         left = self.evaluate(node.left)
         right = self.evaluate(node.right)
 
-        if node.operator == "+":
-            return left + right
+        try:
+            if node.operator == "+":
+                return left + right
 
-        if node.operator == "-":
-            return left - right
+            if node.operator == "-":
+                return left - right
 
-        if node.operator == "*":
-            return left * right
+            if node.operator == "*":
+                return left * right
 
-        if node.operator == "/":
-            if right == 0:
-                raise RuntimeError(
-                    "Division par zéro"
-                )
+            if node.operator == "/":
+                if right == 0:
+                    raise PyQRuntimeError(
+                        "Division par zéro",
+                        node
+                    )
 
-            return left / right
+                return left / right
 
-        raise RuntimeError(
-            f"Opérateur inconnu : {node.operator}"
+        except TypeError:
+            raise PyQRuntimeError(
+                f"Opération impossible avec les valeurs fournies",
+                node
+            )
+
+        raise PyQRuntimeError(
+            f"Opérateur inconnu : {node.operator}",
+            node
         )
 
     def evaluate_comparison(self, node):
         left = self.evaluate(node.left)
         right = self.evaluate(node.right)
 
-        if node.operator == "==":
-            return left == right
+        try:
+            if node.operator == "==":
+                return left == right
 
-        if node.operator == "!=":
-            return left != right
+            if node.operator == "!=":
+                return left != right
 
-        if node.operator == ">":
-            return left > right
+            if node.operator == ">":
+                return left > right
 
-        if node.operator == "<":
-            return left < right
+            if node.operator == "<":
+                return left < right
 
-        if node.operator == ">=":
-            return left >= right
+            if node.operator == ">=":
+                return left >= right
 
-        if node.operator == "<=":
-            return left <= right
+            if node.operator == "<=":
+                return left <= right
 
-        raise RuntimeError(
-            f"Comparaison inconnue : {node.operator}"
+        except TypeError:
+            raise PyQRuntimeError(
+                "Comparaison impossible entre ces valeurs",
+                node
+            )
+
+        raise PyQRuntimeError(
+            f"Comparaison inconnue : {node.operator}",
+            node
         )
 
     def evaluate_logical_operation(self, node):
@@ -571,8 +641,9 @@ class Interpreter:
                 self.evaluate(node.right)
             )
 
-        raise RuntimeError(
-            f"Opérateur logique inconnu : {node.operator}"
+        raise PyQRuntimeError(
+            f"Opérateur logique inconnu : {node.operator}",
+            node
         )
 
     def evaluate_unary_operation(self, node):
@@ -581,6 +652,7 @@ class Interpreter:
         if node.operator == "non":
             return not value
 
-        raise RuntimeError(
-            f"Opérateur unaire inconnu : {node.operator}"
+        raise PyQRuntimeError(
+            f"Opérateur unaire inconnu : {node.operator}",
+            node
         )
