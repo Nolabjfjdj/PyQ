@@ -16,13 +16,13 @@ class StringLiteral(Node):
 
 
 @dataclass
-class Identifier(Node):
-    name: str
+class NumberLiteral(Node):
+    value: int
 
 
 @dataclass
-class NumberLiteral(Node):
-    value: int
+class Identifier(Node):
+    name: str
 
 
 @dataclass
@@ -35,3 +35,10 @@ class FunctionCall(Node):
 class VariableAssignment(Node):
     name: str
     value: Node
+
+
+@dataclass
+class BinaryOperation(Node):
+    left: Node
+    operator: str
+    right: Node
