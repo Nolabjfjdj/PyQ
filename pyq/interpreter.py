@@ -8,6 +8,8 @@ from .ast import (
     FunctionCall,
     VariableAssignment,
     ListAssignment,
+    FunctionDefinition,
+    ReturnStatement,
     BinaryOperation,
     Comparison,
     LogicalOperation,
@@ -17,12 +19,26 @@ from .ast import (
 )
 
 
+class ReturnSignal(Exception):
+    def __init__(self, value):
+        self.value = value
+
+
 class Interpreter:
     def __init__(self):
         self.variables = {}
+        self.functions = {}
+        self.local_scopes = []
 
     def execute(self, program):
         for statement in program.statements:
+            if isinstance(statement, FunctionDefinition):
+                self.functions[statement.name] = statement
+
+        for statement in program.statements:
+            if isinstance(statement, FunctionDefinition):
+                continue
+
             self.execute_statement(statement)
 
     def execute_statement(self, statement):
@@ -34,6 +50,23 @@ class Interpreter:
 
         if isinstance(statement, FunctionCall):
             return self.execute_function_call(statement)
+
+        if isinstance(statement, FunctionDefinition):
+            self.functions[statement.name] = statement
+            return
+
+        if isinstance(statement, ReturnStatement):
+            if not self.local_scopes:
+                raise RuntimeError(
+                    "'retourner' ne peut être utilisé qu'à l'intérieur d'une fonction"
+                )
+
+            value = None
+
+            if statement.value is not None:
+                value = self.evaluate(statement.value)
+
+            raise ReturnSignal(value)
 
         if isinstance(statement, IfStatement):
             return self.execute_if(statement)
@@ -47,7 +80,11 @@ class Interpreter:
 
     def execute_assignment(self, statement):
         value = self.evaluate(statement.value)
-        self.variables[statement.name] = value
+
+        if self.local_scopes:
+            self.local_scopes[-1][statement.name] = value
+        else:
+            self.variables[statement.name] = value
 
     def execute_list_assignment(self, statement):
         list_value = self.evaluate(statement.list_node)
@@ -66,6 +103,7 @@ class Interpreter:
 
         try:
             list_value[index] = value
+
         except IndexError:
             raise RuntimeError(
                 f"Index de liste hors limites : {index}"
@@ -73,20 +111,73 @@ class Interpreter:
 
     def execute_function_call(self, statement):
         if statement.name == "afficher":
-            value = self.evaluate(statement.argument)
+            if len(statement.arguments) != 1:
+                raise RuntimeError(
+                    "afficher() attend exactement un argument"
+                )
 
-            if value is True:
-                print("vrai")
-            elif value is False:
-                print("faux")
-            else:
-                print(value)
+            value = self.evaluate(statement.arguments[0])
 
-            return
+            self.print_value(value)
 
-        raise RuntimeError(
-            f"Fonction inconnue : {statement.name}"
+            return None
+
+        return self.call_function(
+            statement.name,
+            statement.arguments
         )
+
+    def call_function(self, name, arguments):
+        if name not in self.functions:
+            raise RuntimeError(
+                f"Fonction inconnue : {name}"
+            )
+
+        function = self.functions[name]
+
+        if len(arguments) != len(function.parameters):
+            raise RuntimeError(
+                f"La fonction {name}() attend "
+                f"{len(function.parameters)} argument(s), "
+                f"mais {len(arguments)} ont été fournis"
+            )
+
+        values = [
+            self.evaluate(argument)
+            for argument in arguments
+        ]
+
+        local_scope = {}
+
+        for parameter, value in zip(
+            function.parameters,
+            values
+        ):
+            local_scope[parameter] = value
+
+        self.local_scopes.append(local_scope)
+
+        try:
+            for statement in function.body:
+                self.execute_statement(statement)
+
+        except ReturnSignal as signal:
+            return signal.value
+
+        finally:
+            self.local_scopes.pop()
+
+        return None
+
+    def print_value(self, value):
+        if value is True:
+            print("vrai")
+
+        elif value is False:
+            print("faux")
+
+        else:
+            print(value)
 
     def execute_if(self, statement):
         condition = self.evaluate(statement.condition)
@@ -115,12 +206,7 @@ class Interpreter:
             return node.value
 
         if isinstance(node, Identifier):
-            if node.name not in self.variables:
-                raise RuntimeError(
-                    f"Variable inconnue : {node.name}"
-                )
-
-            return self.variables[node.name]
+            return self.get_variable(node.name)
 
         if isinstance(node, ListLiteral):
             return [
@@ -130,6 +216,12 @@ class Interpreter:
 
         if isinstance(node, ListAccess):
             return self.evaluate_list_access(node)
+
+        if isinstance(node, FunctionCall):
+            return self.call_function(
+                node.name,
+                node.arguments
+            )
 
         if isinstance(node, BinaryOperation):
             return self.evaluate_binary_operation(node)
@@ -145,6 +237,20 @@ class Interpreter:
 
         raise RuntimeError(
             f"Expression inconnue : {type(node).__name__}"
+        )
+
+    def get_variable(self, name):
+        if self.local_scopes:
+            local_scope = self.local_scopes[-1]
+
+            if name in local_scope:
+                return local_scope[name]
+
+        if name in self.variables:
+            return self.variables[name]
+
+        raise RuntimeError(
+            f"Variable inconnue : {name}"
         )
 
     def evaluate_list_access(self, node):
@@ -163,6 +269,7 @@ class Interpreter:
 
         try:
             return list_value[index]
+
         except IndexError:
             raise RuntimeError(
                 f"Index de liste hors limites : {index}"
@@ -183,7 +290,9 @@ class Interpreter:
 
         if node.operator == "/":
             if right == 0:
-                raise RuntimeError("Division par zéro")
+                raise RuntimeError(
+                    "Division par zéro"
+                )
 
             return left / right
 
@@ -224,13 +333,17 @@ class Interpreter:
             if not left:
                 return False
 
-            return bool(self.evaluate(node.right))
+            return bool(
+                self.evaluate(node.right)
+            )
 
         if node.operator == "ou":
             if left:
                 return True
 
-            return bool(self.evaluate(node.right))
+            return bool(
+                self.evaluate(node.right)
+            )
 
         raise RuntimeError(
             f"Opérateur logique inconnu : {node.operator}"
