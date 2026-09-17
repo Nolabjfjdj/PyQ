@@ -110,3 +110,10 @@ class IfStatement(Node):
 class WhileStatement(Node):
     condition: Node
     body: list
+
+
+@dataclass
+class ForStatement(Node):
+    variable: str
+    iterable: Node
+    body: list
