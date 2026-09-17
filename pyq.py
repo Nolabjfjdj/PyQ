@@ -1,8 +1,8 @@
 import sys
 
-from PYQ.lexer import Lexer
-from PYQ.parser import Parser
-from PYQ.interpreter import Interpreter
+from pyq.lexer import Lexer
+from pyq.parser import Parser
+from pyq.interpreter import Interpreter
 
 
 def run_file(filename):
