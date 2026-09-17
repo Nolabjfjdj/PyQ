@@ -7,6 +7,7 @@ from .ast import (
     VariableAssignment,
     BinaryOperation,
     Comparison,
+    IfStatement,
 )
 
 
@@ -24,6 +25,9 @@ class Interpreter:
 
         if isinstance(statement, FunctionCall):
             return self.execute_function_call(statement)
+
+        if isinstance(statement, IfStatement):
+            return self.execute_if(statement)
 
         raise RuntimeError(
             f"Instruction inconnue : {type(statement).__name__}"
@@ -49,6 +53,17 @@ class Interpreter:
         raise RuntimeError(
             f"Fonction inconnue : {statement.name}"
         )
+
+    def execute_if(self, statement):
+        condition = self.evaluate(statement.condition)
+
+        if condition:
+            for instruction in statement.body:
+                self.execute_statement(instruction)
+
+        elif statement.else_body is not None:
+            for instruction in statement.else_body:
+                self.execute_statement(instruction)
 
     def evaluate(self, node):
         if isinstance(node, StringLiteral):
