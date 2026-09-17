@@ -18,6 +18,8 @@ from .ast import (
     IfStatement,
     WhileStatement,
     ForStatement,
+    BreakStatement,
+    ContinueStatement,
 )
 
 
@@ -86,6 +88,22 @@ class Parser:
 
         if token.value == "retourner":
             return self.parse_return()
+
+        if token.value == "interrompre":
+            self.advance()
+
+            if self.current().type == "NEWLINE":
+                self.advance()
+
+            return BreakStatement()
+
+        if token.value == "continuer":
+            self.advance()
+
+            if self.current().type == "NEWLINE":
+                self.advance()
+
+            return ContinueStatement()
 
         if token.value == "sinon":
             raise SyntaxError(
