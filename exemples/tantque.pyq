@@ -1,0 +1,5 @@
+compteur = 1
+
+tantque compteur <= 5:
+    afficher(compteur)
+    compteur = compteur + 1
