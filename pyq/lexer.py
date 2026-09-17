@@ -1,266 +1,209 @@
-from dataclasses import dataclass
-
-
-@dataclass
 class Token:
-    type: str
-    value: str
-    position: int
+    def __init__(self, type_, value, position):
+        self.type = type_
+        self.value = value
+        self.position = position
+
+    def __repr__(self):
+        return f"Token({self.type}, {self.value!r})"
 
 
 class Lexer:
-    def __init__(self, source: str):
+    def __init__(self, source):
         self.source = source
-        self.position = 0
-        self.indent_stack = [0]
+        self.tokens = []
+        self.indentation_stack = [0]
 
     def tokenize(self):
-        tokens = []
-        at_line_start = True
+        lines = self.source.splitlines()
 
-        while self.position < len(self.source):
-            char = self.source[self.position]
+        for line_number, line in enumerate(lines, start=1):
+            stripped = line.lstrip()
 
-            if at_line_start:
-                if char == "\n":
-                    tokens.append(Token("NEWLINE", "\n", self.position))
-                    self.position += 1
-                    continue
+            if not stripped:
+                self.tokens.append(
+                    Token("NEWLINE", "\n", line_number)
+                )
+                continue
 
-                indent = 0
+            if stripped.startswith("#"):
+                self.tokens.append(
+                    Token("NEWLINE", "\n", line_number)
+                )
+                continue
 
-                while self.position < len(self.source):
-                    char = self.source[self.position]
+            indentation = len(line) - len(stripped)
 
-                    if char == " ":
-                        indent += 1
-                        self.position += 1
-                    elif char == "\t":
-                        indent += 4
-                        self.position += 1
-                    else:
-                        break
+            if indentation > self.indentation_stack[-1]:
+                self.indentation_stack.append(indentation)
+                self.tokens.append(
+                    Token("INDENT", indentation, line_number)
+                )
 
-                if self.position >= len(self.source):
+            elif indentation < self.indentation_stack[-1]:
+                while (
+                    indentation < self.indentation_stack[-1]
+                ):
+                    self.indentation_stack.pop()
+                    self.tokens.append(
+                        Token("DEDENT", indentation, line_number)
+                    )
+
+                if indentation != self.indentation_stack[-1]:
+                    raise SyntaxError(
+                        f"Indentation invalide à la ligne {line_number}"
+                    )
+
+            i = indentation
+
+            while i < len(line):
+                char = line[i]
+
+                if char == "#":
                     break
 
-                if self.source[self.position] == "\n":
-                    tokens.append(
-                        Token("NEWLINE", "\n", self.position)
-                    )
-                    self.position += 1
+                if char.isspace():
+                    i += 1
                     continue
 
-                current_indent = self.indent_stack[-1]
+                if char == '"':
+                    start = i
+                    i += 1
+                    value = ""
 
-                if indent > current_indent:
-                    self.indent_stack.append(indent)
-                    tokens.append(
-                        Token("INDENT", str(indent), self.position)
-                    )
+                    while i < len(line):
+                        if line[i] == '"':
+                            break
 
-                elif indent < current_indent:
-                    while indent < self.indent_stack[-1]:
-                        self.indent_stack.pop()
-                        tokens.append(
-                            Token("DEDENT", str(indent), self.position)
-                        )
+                        value += line[i]
+                        i += 1
 
-                    if indent != self.indent_stack[-1]:
+                    if i >= len(line):
                         raise SyntaxError(
-                            f"Indentation invalide à la position {self.position}"
+                            f"Chaîne non terminée à la ligne {line_number}"
                         )
 
-                at_line_start = False
-                continue
+                    i += 1
 
-            if char.isspace():
-                if char == "\n":
-                    tokens.append(
-                        Token("NEWLINE", "\n", self.position)
+                    self.tokens.append(
+                        Token("STRING", value, line_number)
                     )
-                    self.position += 1
-                    at_line_start = True
-                else:
-                    self.position += 1
-                continue
 
-            if char == ":":
-                tokens.append(Token("COLON", ":", self.position))
-                self.position += 1
-                continue
+                    continue
 
-            if char == "(":
-                tokens.append(Token("LPAREN", "(", self.position))
-                self.position += 1
-                continue
+                if char.isdigit():
+                    start = i
 
-            if char == ")":
-                tokens.append(Token("RPAREN", ")", self.position))
-                self.position += 1
-                continue
+                    while (
+                        i < len(line)
+                        and line[i].isdigit()
+                    ):
+                        i += 1
 
-            if char == "[":
-                tokens.append(Token("LBRACKET", "[", self.position))
-                self.position += 1
-                continue
+                    value = line[start:i]
 
-            if char == "]":
-                tokens.append(Token("RBRACKET", "]", self.position))
-                self.position += 1
-                continue
-
-            if char == ",":
-                tokens.append(Token("COMMA", ",", self.position))
-                self.position += 1
-                continue
-
-            if char == "=":
-                if self._peek("="):
-                    tokens.append(
-                        Token("EQUALS_EQUALS", "==", self.position)
+                    self.tokens.append(
+                        Token("NUMBER", value, line_number)
                     )
-                    self.position += 2
-                else:
-                    tokens.append(
-                        Token("EQUALS", "=", self.position)
-                    )
-                    self.position += 1
-                continue
 
-            if char == "!":
-                if self._peek("="):
-                    tokens.append(
-                        Token("NOT_EQUALS", "!=", self.position)
+                    continue
+
+                if char.isalpha() or char == "_":
+                    start = i
+
+                    while (
+                        i < len(line)
+                        and (
+                            line[i].isalnum()
+                            or line[i] == "_"
+                        )
+                    ):
+                        i += 1
+
+                    value = line[start:i]
+
+                    self.tokens.append(
+                        Token(
+                            "IDENTIFIER",
+                            value,
+                            line_number
+                        )
                     )
-                    self.position += 2
+
+                    continue
+
+                if line.startswith("==", i):
+                    self.tokens.append(
+                        Token("EQUALS_EQUALS", "==", line_number)
+                    )
+                    i += 2
+                    continue
+
+                if line.startswith("!=", i):
+                    self.tokens.append(
+                        Token("NOT_EQUALS", "!=", line_number)
+                    )
+                    i += 2
+                    continue
+
+                if line.startswith(">=", i):
+                    self.tokens.append(
+                        Token("GREATER_EQUALS", ">=", line_number)
+                    )
+                    i += 2
+                    continue
+
+                if line.startswith("<=", i):
+                    self.tokens.append(
+                        Token("LESS_EQUALS", "<=", line_number)
+                    )
+                    i += 2
+                    continue
+
+                single_char_tokens = {
+                    "=": "EQUALS",
+                    ">": "GREATER",
+                    "<": "LESS",
+                    "+": "PLUS",
+                    "-": "MINUS",
+                    "*": "STAR",
+                    "/": "SLASH",
+                    ":": "COLON",
+                    "(": "LPAREN",
+                    ")": "RPAREN",
+                    "[": "LBRACKET",
+                    "]": "RBRACKET",
+                    ",": "COMMA",
+                }
+
+                if char in single_char_tokens:
+                    self.tokens.append(
+                        Token(
+                            single_char_tokens[char],
+                            char,
+                            line_number
+                        )
+                    )
+                    i += 1
                     continue
 
                 raise SyntaxError(
-                    f"Caractère inattendu à la position {self.position}: !"
+                    f"Caractère inattendu '{char}' "
+                    f"à la ligne {line_number}"
                 )
 
-            if char == ">":
-                if self._peek("="):
-                    tokens.append(
-                        Token("GREATER_EQUALS", ">=", self.position)
-                    )
-                    self.position += 2
-                else:
-                    tokens.append(
-                        Token("GREATER", ">", self.position)
-                    )
-                    self.position += 1
-                continue
-
-            if char == "<":
-                if self._peek("="):
-                    tokens.append(
-                        Token("LESS_EQUALS", "<=", self.position)
-                    )
-                    self.position += 2
-                else:
-                    tokens.append(
-                        Token("LESS", "<", self.position)
-                    )
-                    self.position += 1
-                continue
-
-            if char == "+":
-                tokens.append(Token("PLUS", "+", self.position))
-                self.position += 1
-                continue
-
-            if char == "-":
-                tokens.append(Token("MINUS", "-", self.position))
-                self.position += 1
-                continue
-
-            if char == "*":
-                tokens.append(Token("STAR", "*", self.position))
-                self.position += 1
-                continue
-
-            if char == "/":
-                tokens.append(Token("SLASH", "/", self.position))
-                self.position += 1
-                continue
-
-            if char == '"':
-                tokens.append(self._read_string())
-                continue
-
-            if char.isdigit():
-                tokens.append(self._read_number())
-                continue
-
-            if char.isalpha() or char == "_":
-                tokens.append(self._read_identifier())
-                continue
-
-            raise SyntaxError(
-                f"Caractère inattendu à la position {self.position}: {char}"
+            self.tokens.append(
+                Token("NEWLINE", "\n", line_number)
             )
 
-        while len(self.indent_stack) > 1:
-            self.indent_stack.pop()
-            tokens.append(Token("DEDENT", "", self.position))
+        while len(self.indentation_stack) > 1:
+            self.indentation_stack.pop()
+            self.tokens.append(
+                Token("DEDENT", 0, len(lines))
+            )
 
-        tokens.append(Token("EOF", "", self.position))
-
-        return tokens
-
-    def _peek(self, expected):
-        next_position = self.position + 1
-
-        return (
-            next_position < len(self.source)
-            and self.source[next_position] == expected
+        self.tokens.append(
+            Token("EOF", None, len(lines))
         )
 
-    def _read_string(self):
-        start = self.position
-        self.position += 1
-
-        value = ""
-
-        while self.position < len(self.source):
-            char = self.source[self.position]
-
-            if char == '"':
-                self.position += 1
-                return Token("STRING", value, start)
-
-            value += char
-            self.position += 1
-
-        raise SyntaxError("Chaîne de caractères non terminée")
-
-    def _read_number(self):
-        start = self.position
-
-        while (
-            self.position < len(self.source)
-            and self.source[self.position].isdigit()
-        ):
-            self.position += 1
-
-        value = self.source[start:self.position]
-
-        return Token("NUMBER", value, start)
-
-    def _read_identifier(self):
-        start = self.position
-
-        while (
-            self.position < len(self.source)
-            and (
-                self.source[self.position].isalnum()
-                or self.source[self.position] == "_"
-            )
-        ):
-            self.position += 1
-
-        value = self.source[start:self.position]
-
-        return Token("IDENTIFIER", value, start)
+        return self.tokens
