@@ -1,0 +1,8 @@
+age = 14
+
+afficher(age == 14)
+afficher(age != 10)
+afficher(age > 10)
+afficher(age < 20)
+afficher(age >= 14)
+afficher(age <= 14)
