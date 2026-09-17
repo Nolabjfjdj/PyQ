@@ -1,33 +1,30 @@
-"""Point d'entrée temporaire de PyQ."""
-
 import sys
-from pathlib import Path
 
-from pyq.translator import traduire_fichier
+from PYQ.lexer import Lexer
+from PYQ.parser import Parser
+from PYQ.interpreter import Interpreter
 
 
-def main() -> None:
-    """Lance le traducteur PyQ."""
+def run_file(filename):
+    with open(filename, "r", encoding="utf-8") as file:
+        source = file.read()
 
+    lexer = Lexer(source)
+    tokens = lexer.tokenize()
+
+    parser = Parser(tokens)
+    program = parser.parse()
+
+    interpreter = Interpreter()
+    interpreter.execute(program)
+
+
+def main():
     if len(sys.argv) != 2:
-        print("Utilisation : python pyq.py <programme.pyq>")
+        print("Utilisation : python PYQ.py <fichier.pyQ>")
         sys.exit(1)
 
-    source = Path(sys.argv[1])
-
-    if not source.exists():
-        print(f"Erreur : le fichier '{source}' n'existe pas.")
-        sys.exit(1)
-
-    if source.suffix != ".pyq":
-        print("Erreur : le fichier doit avoir l'extension .pyq.")
-        sys.exit(1)
-
-    destination = source.with_suffix(".py")
-
-    traduire_fichier(source, destination)
-
-    print(f"PyQ : {source} → {destination}")
+    run_file(sys.argv[1])
 
 
 if __name__ == "__main__":
