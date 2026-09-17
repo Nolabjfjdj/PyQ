@@ -21,7 +21,7 @@ def run_file(filename):
 
 def main():
     if len(sys.argv) != 2:
-        print("Utilisation : python PYQ.py <fichier.pyQ>")
+        print("Utilisation : python pyq.py <fichier.pyq>")
         sys.exit(1)
 
     run_file(sys.argv[1])
