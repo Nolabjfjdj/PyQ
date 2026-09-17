@@ -4,8 +4,11 @@ from .ast import (
     NumberLiteral,
     BooleanLiteral,
     Identifier,
+    ListLiteral,
+    ListAccess,
     FunctionCall,
     VariableAssignment,
+    ListAssignment,
     BinaryOperation,
     Comparison,
     LogicalOperation,
@@ -77,10 +80,14 @@ class Parser:
                 f"'sinon' inattendu à la position {token.position}"
             )
 
-        next_token = self.tokens[self.position + 1]
-
-        if next_token.type == "EQUALS":
+        if self.tokens[self.position + 1].type == "EQUALS":
             statement = self.parse_assignment()
+
+        elif (
+            self.tokens[self.position + 1].type == "LBRACKET"
+        ):
+            statement = self.parse_list_assignment()
+
         else:
             statement = self.parse_function_call()
 
@@ -171,6 +178,24 @@ class Parser:
         value = self.parse_expression()
 
         return VariableAssignment(name, value)
+
+    def parse_list_assignment(self):
+        name = self.expect("IDENTIFIER").value
+
+        self.expect("LBRACKET")
+
+        index = self.parse_expression()
+
+        self.expect("RBRACKET")
+        self.expect("EQUALS")
+
+        value = self.parse_expression()
+
+        return ListAssignment(
+            Identifier(name),
+            index,
+            value
+        )
 
     def parse_function_call(self):
         name = self.expect("IDENTIFIER").value
@@ -314,7 +339,24 @@ class Parser:
             if token.value == "faux":
                 return BooleanLiteral(False)
 
-            return Identifier(token.value)
+            expression = Identifier(token.value)
+
+            while self.current().type == "LBRACKET":
+                self.advance()
+
+                index = self.parse_expression()
+
+                self.expect("RBRACKET")
+
+                expression = ListAccess(
+                    expression,
+                    index
+                )
+
+            return expression
+
+        if token.type == "LBRACKET":
+            return self.parse_list()
 
         if token.type == "LPAREN":
             self.advance()
@@ -328,3 +370,21 @@ class Parser:
         raise SyntaxError(
             f"Expression invalide à la position {token.position}"
         )
+
+    def parse_list(self):
+        self.expect("LBRACKET")
+
+        elements = []
+
+        if self.current().type != "RBRACKET":
+            while True:
+                elements.append(self.parse_expression())
+
+                if self.current().type != "COMMA":
+                    break
+
+                self.advance()
+
+        self.expect("RBRACKET")
+
+        return ListLiteral(elements)
