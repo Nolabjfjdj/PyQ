@@ -1,0 +1,21 @@
+valeur = nul
+
+afficher(valeur)
+
+fonction test():
+    afficher("Bonjour")
+
+resultat = test()
+
+si resultat == nul:
+    afficher("Aucune valeur")
+
+fonction donner():
+    retourner nul
+
+autre = donner()
+
+si autre == nul:
+    afficher("Retour nul")
+
+afficher(5 == nul)
