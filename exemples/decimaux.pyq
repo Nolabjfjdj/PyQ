@@ -1,0 +1,21 @@
+prix = 19.99
+temperature = 21.5
+
+afficher(prix)
+afficher(temperature)
+
+a = 10.5
+b = 2.5
+
+afficher(a + b)
+afficher(a - b)
+afficher(a * b)
+afficher(a / b)
+
+afficher(a > b)
+afficher(a == 10.5)
+
+nombres = [1.5, 2.5, 3.5]
+
+pour nombre dans nombres:
+    afficher(nombre)
