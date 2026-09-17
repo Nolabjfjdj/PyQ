@@ -7,8 +7,7 @@ from .ast import (
     Identifier,
     ListLiteral,
     DictLiteral,
-    ListAccess,
-    DictAccess,
+    IndexAccess,
     FunctionCall,
     VariableAssignment,
     IndexAssignment,
@@ -493,15 +492,15 @@ class Parser:
             self.advance()
 
             if token.value == "vrai":
-                return BooleanLiteral(True)
+                expression = BooleanLiteral(True)
 
-            if token.value == "faux":
-                return BooleanLiteral(False)
+            elif token.value == "faux":
+                expression = BooleanLiteral(False)
 
-            if token.value == "nul":
-                return NullLiteral()
+            elif token.value == "nul":
+                expression = NullLiteral()
 
-            if self.current().type == "LPAREN":
+            elif self.current().type == "LPAREN":
                 self.advance()
 
                 arguments = []
@@ -525,31 +524,15 @@ class Parser:
             else:
                 expression = Identifier(token.value)
 
-            while self.current().type == "LBRACKET":
-                self.advance()
-
-                index = self.parse_expression()
-
-                self.expect("RBRACKET")
-
-                if isinstance(expression, Identifier):
-                    expression = ListAccess(
-                        expression,
-                        index
-                    )
-                else:
-                    expression = DictAccess(
-                        expression,
-                        index
-                    )
-
-            return expression
+            return self.parse_index_access(expression)
 
         if token.type == "LBRACKET":
-            return self.parse_list()
+            expression = self.parse_list()
+            return self.parse_index_access(expression)
 
         if token.type == "LBRACE":
-            return self.parse_dict()
+            expression = self.parse_dict()
+            return self.parse_index_access(expression)
 
         if token.type == "LPAREN":
             self.advance()
@@ -558,11 +541,26 @@ class Parser:
 
             self.expect("RPAREN")
 
-            return expression
+            return self.parse_index_access(expression)
 
         raise SyntaxError(
             f"Expression invalide à la position {token.position}"
         )
+
+    def parse_index_access(self, expression):
+        while self.current().type == "LBRACKET":
+            self.advance()
+
+            index = self.parse_expression()
+
+            self.expect("RBRACKET")
+
+            expression = IndexAccess(
+                expression,
+                index
+            )
+
+        return expression
 
     def parse_list(self):
         self.expect("LBRACKET")
