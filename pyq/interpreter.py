@@ -378,56 +378,127 @@ class Interpreter:
                     "La clé du dictionnaire n'est pas valide"
                 )
 
+        if isinstance(target, str):
+            if not isinstance(index, int):
+                raise RuntimeError(
+                    "L'index d'une chaîne doit être un nombre entier"
+                )
+
+            try:
+                return target[index]
+            except IndexError:
+                raise RuntimeError(
+                    f"Index de chaîne hors limites : {index}"
+                )
+
         raise RuntimeError(
-            "La valeur ciblée n'est ni une liste ni un dictionnaire"
+            "La valeur ciblée ne peut pas être indexée"
         )
 
     def execute_method_call(self, node):
         target = self.evaluate(node.target)
 
-        if not isinstance(target, list):
+        if isinstance(target, list):
+            if node.name == "ajouter":
+                if len(node.arguments) != 1:
+                    raise RuntimeError(
+                        "ajouter() attend exactement un argument"
+                    )
+
+                value = self.evaluate(node.arguments[0])
+                target.append(value)
+
+                return None
+
+            if node.name == "retirer":
+                if len(node.arguments) != 1:
+                    raise RuntimeError(
+                        "retirer() attend exactement un argument"
+                    )
+
+                value = self.evaluate(node.arguments[0])
+
+                try:
+                    target.remove(value)
+                except ValueError:
+                    raise RuntimeError(
+                        f"Valeur absente de la liste : {value}"
+                    )
+
+                return None
+
+            if node.name == "taille":
+                if len(node.arguments) != 0:
+                    raise RuntimeError(
+                        "taille() n'attend aucun argument"
+                    )
+
+                return len(target)
+
             raise RuntimeError(
-                f"La méthode '{node.name}' ne peut être utilisée que sur une liste"
+                f"Méthode de liste inconnue : {node.name}"
             )
 
-        if node.name == "ajouter":
-            if len(node.arguments) != 1:
-                raise RuntimeError(
-                    "ajouter() attend exactement un argument"
-                )
+        if isinstance(target, str):
+            if node.name == "taille":
+                if len(node.arguments) != 0:
+                    raise RuntimeError(
+                        "taille() n'attend aucun argument"
+                    )
 
-            value = self.evaluate(node.arguments[0])
-            target.append(value)
+                return len(target)
 
-            return None
+            if node.name == "contient":
+                if len(node.arguments) != 1:
+                    raise RuntimeError(
+                        "contient() attend exactement un argument"
+                    )
 
-        if node.name == "retirer":
-            if len(node.arguments) != 1:
-                raise RuntimeError(
-                    "retirer() attend exactement un argument"
-                )
+                value = self.evaluate(node.arguments[0])
 
-            value = self.evaluate(node.arguments[0])
+                if not isinstance(value, str):
+                    raise RuntimeError(
+                        "contient() attend une chaîne de caractères"
+                    )
 
-            try:
-                target.remove(value)
-            except ValueError:
-                raise RuntimeError(
-                    f"Valeur absente de la liste : {value}"
-                )
+                return value in target
 
-            return None
+            if node.name == "commence_par":
+                if len(node.arguments) != 1:
+                    raise RuntimeError(
+                        "commence_par() attend exactement un argument"
+                    )
 
-        if node.name == "taille":
-            if len(node.arguments) != 0:
-                raise RuntimeError(
-                    "taille() n'attend aucun argument"
-                )
+                value = self.evaluate(node.arguments[0])
 
-            return len(target)
+                if not isinstance(value, str):
+                    raise RuntimeError(
+                        "commence_par() attend une chaîne de caractères"
+                    )
+
+                return target.startswith(value)
+
+            if node.name == "finit_par":
+                if len(node.arguments) != 1:
+                    raise RuntimeError(
+                        "finit_par() attend exactement un argument"
+                    )
+
+                value = self.evaluate(node.arguments[0])
+
+                if not isinstance(value, str):
+                    raise RuntimeError(
+                        "finit_par() attend une chaîne de caractères"
+                    )
+
+                return target.endswith(value)
+
+            raise RuntimeError(
+                f"Méthode de chaîne inconnue : {node.name}"
+            )
 
         raise RuntimeError(
-            f"Méthode de liste inconnue : {node.name}"
+            f"Les méthodes ne sont pas disponibles pour cette valeur"
         )
 
     def evaluate_binary_operation(self, node):
