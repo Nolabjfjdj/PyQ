@@ -7,6 +7,7 @@ from .ast import (
     ListLiteral,
     DictLiteral,
     IndexAccess,
+    MethodCall,
     FunctionCall,
     VariableAssignment,
     IndexAssignment,
@@ -63,6 +64,9 @@ class Interpreter:
 
         if isinstance(statement, FunctionCall):
             return self.execute_function_call(statement)
+
+        if isinstance(statement, MethodCall):
+            return self.evaluate(statement)
 
         if isinstance(statement, FunctionDefinition):
             self.functions[statement.name] = statement
@@ -290,6 +294,9 @@ class Interpreter:
         if isinstance(node, IndexAccess):
             return self.evaluate_index_access(node)
 
+        if isinstance(node, MethodCall):
+            return self.execute_method_call(node)
+
         if isinstance(node, FunctionCall):
             return self.call_function(
                 node.name,
@@ -373,6 +380,54 @@ class Interpreter:
 
         raise RuntimeError(
             "La valeur ciblée n'est ni une liste ni un dictionnaire"
+        )
+
+    def execute_method_call(self, node):
+        target = self.evaluate(node.target)
+
+        if not isinstance(target, list):
+            raise RuntimeError(
+                f"La méthode '{node.name}' ne peut être utilisée que sur une liste"
+            )
+
+        if node.name == "ajouter":
+            if len(node.arguments) != 1:
+                raise RuntimeError(
+                    "ajouter() attend exactement un argument"
+                )
+
+            value = self.evaluate(node.arguments[0])
+            target.append(value)
+
+            return None
+
+        if node.name == "retirer":
+            if len(node.arguments) != 1:
+                raise RuntimeError(
+                    "retirer() attend exactement un argument"
+                )
+
+            value = self.evaluate(node.arguments[0])
+
+            try:
+                target.remove(value)
+            except ValueError:
+                raise RuntimeError(
+                    f"Valeur absente de la liste : {value}"
+                )
+
+            return None
+
+        if node.name == "taille":
+            if len(node.arguments) != 0:
+                raise RuntimeError(
+                    "taille() n'attend aucun argument"
+                )
+
+            return len(target)
+
+        raise RuntimeError(
+            f"Méthode de liste inconnue : {node.name}"
         )
 
     def evaluate_binary_operation(self, node):
