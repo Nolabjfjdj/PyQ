@@ -1,0 +1,13 @@
+# Premier commentaire
+
+nom = "Nolan"
+age = 14
+
+# On affiche le nom
+afficher(nom)
+
+afficher(age) # Commentaire après une instruction
+
+afficher("Le symbole # fonctionne")
+
+# Dernier commentaire
