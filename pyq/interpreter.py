@@ -2,6 +2,7 @@ from .ast import (
     StringLiteral,
     NumberLiteral,
     BooleanLiteral,
+    NullLiteral,
     Identifier,
     ListLiteral,
     ListAccess,
@@ -196,6 +197,9 @@ class Interpreter:
         elif value is False:
             print("faux")
 
+        elif value is None:
+            print("nul")
+
         else:
             print(value)
 
@@ -255,6 +259,9 @@ class Interpreter:
 
         if isinstance(node, BooleanLiteral):
             return node.value
+
+        if isinstance(node, NullLiteral):
+            return None
 
         if isinstance(node, Identifier):
             return self.get_variable(node.name)
