@@ -4,6 +4,7 @@ from .ast import (
     Identifier,
     FunctionCall,
     VariableAssignment,
+    BinaryOperation,
 )
 
 
@@ -55,6 +56,34 @@ class Interpreter:
 
             return self.variables[node.name]
 
+        if isinstance(node, BinaryOperation):
+            return self.evaluate_binary_operation(node)
+
         raise RuntimeError(
             f"Expression inconnue : {type(node).__name__}"
+        )
+
+    def evaluate_binary_operation(self, node):
+        left = self.evaluate(node.left)
+        right = self.evaluate(node.right)
+
+        if node.operator == "+":
+            return left + right
+
+        if node.operator == "-":
+            return left - right
+
+        if node.operator == "*":
+            return left * right
+
+        if node.operator == "/":
+            if right == 0:
+                raise RuntimeError(
+                    "Division par zéro"
+                )
+
+            return left / right
+
+        raise RuntimeError(
+            f"Opérateur inconnu : {node.operator}"
         )
