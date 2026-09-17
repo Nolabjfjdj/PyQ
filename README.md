@@ -18,16 +18,25 @@ PyQ prend actuellement en charge :
 - Parenthèses
 - Booléens `vrai` et `faux`
 - Comparaisons
+- Opérateurs logiques `et`, `ou` et `non`
 - Conditions `si`
 - Conditions `sinon`
 - Blocs avec indentation
 - Boucles `tantque`
-- Fonction `afficher()`
+- Listes
+- Listes imbriquées
+- Accès aux éléments d'une liste
+- Modification des éléments d'une liste
+- Fonctions
+- Paramètres de fonctions
+- Valeurs de retour avec `retourner`
+- Fonctions appelées dans des expressions
 
 ## 📁 Structure du projet
 
 PyQ/
 ├── README.md
+├── LICENSE
 ├── pyq.py
 │
 ├── exemples/
@@ -37,7 +46,11 @@ PyQ/
 │   ├── comparaisons.pyq
 │   ├── booleens.pyq
 │   ├── conditions.pyq
-│   └── tantque.pyq
+│   ├── tantque.pyq
+│   ├── logique.pyq
+│   ├── listes.pyq
+│   ├── fonctions.pyq
+│   └── stress_test.pyq
 │
 └── pyq/
     ├── __init__.py
@@ -53,6 +66,10 @@ PyQ fonctionne actuellement avec Python.
 Pour exécuter un programme :
 
     python pyq.py exemples/bonjour.pyq
+
+Exemple :
+
+    afficher("Bonjour le monde !")
 
 ## 📝 Syntaxe
 
@@ -131,6 +148,25 @@ Exemple :
     afficher(age >= 14)
     afficher(age <= 14)
 
+### Opérateurs logiques
+
+PyQ prend en charge :
+
+    et
+    ou
+    non
+
+Exemple :
+
+    age = 14
+
+    afficher(age >= 13 et age <= 18)
+    afficher(age < 10 ou age == 14)
+
+    connecte = faux
+
+    afficher(non connecte)
+
 ### Conditions
 
 Une condition peut être écrite avec `si` :
@@ -153,7 +189,7 @@ Les blocs sont définis grâce à l'indentation.
 
 ### Boucles `tantque`
 
-PyQ permet également de répéter un bloc tant qu'une condition est vraie :
+PyQ permet de répéter un bloc tant qu'une condition est vraie :
 
     compteur = 1
 
@@ -168,6 +204,48 @@ Résultat :
     3
     4
     5
+
+### Listes
+
+PyQ permet de créer des listes :
+
+    nombres = [10, 20, 30, 40]
+
+    afficher(nombres[0])
+    afficher(nombres[2])
+
+Les éléments peuvent être modifiés :
+
+    nombres[1] = 50
+
+    afficher(nombres[1])
+
+Les listes peuvent également être imbriquées :
+
+    matrice = [[1, 2], [3, 4]]
+
+    afficher(matrice[0][1])
+
+### Fonctions
+
+PyQ permet de créer des fonctions :
+
+    fonction saluer(nom):
+        afficher("Bonjour")
+        afficher(nom)
+
+    saluer("Nolan")
+
+Les fonctions peuvent recevoir plusieurs paramètres :
+
+    fonction additionner(a, b):
+        retourner a + b
+
+    resultat = additionner(10, 5)
+
+    afficher(resultat)
+
+Les fonctions peuvent retourner une valeur avec `retourner`.
 
 ## 🧠 Fonctionnement
 
@@ -198,6 +276,8 @@ Il gère notamment :
 - identifiants
 - opérateurs
 - parenthèses
+- crochets
+- virgules
 - deux-points
 - nouvelles lignes
 - indentation
@@ -213,8 +293,13 @@ Il permet notamment de construire :
 - appels de fonctions
 - opérations
 - comparaisons
+- opérations logiques
+- listes
+- accès aux listes
 - conditions
 - boucles
+- fonctions
+- valeurs de retour
 
 ### AST
 
@@ -234,7 +319,7 @@ L'objectif est de construire progressivement un langage de programmation complet
 
 - une syntaxe cohérente
 - un interpréteur indépendant
-- davantage de types de données
+- plusieurs types de données
 - davantage de structures de contrôle
 - des fonctions
 - des collections
@@ -245,13 +330,28 @@ L'objectif est de construire progressivement un langage de programmation complet
 
 ## 📌 Version actuelle
 
-**PyQ 0.6**
+**PyQ 0.9**
 
-Cette version ajoute notamment :
+La version 0.9 ajoute notamment :
 
-- les boucles `tantque`
-- les modifications de variables
-- l'exécution répétée de blocs
+- Les fonctions
+- Les paramètres
+- Les valeurs de retour
+- Les fonctions imbriquées dans les expressions
+- Les portées locales des fonctions
+
+Les versions précédentes ont notamment introduit :
+
+- Les boucles `tantque`
+- Les opérateurs logiques
+- Les listes
+- Les accès et modifications de listes
+
+## 🚀 Prochaine étape
+
+**PyQ 1.0** sera une étape majeure du développement du langage.
+
+Cette version aura pour objectif de renforcer les fondations de PyQ et d'introduire progressivement de nouvelles fonctionnalités importantes.
 
 ## 👤 Auteur
 
@@ -263,6 +363,4 @@ Développement :
 
 ## 📄 Licence
 
-Le projet est actuellement en développement.
-
-Les conditions de distribution et la licence du projet pourront être définies ultérieurement.
+Voir le fichier `LICENSE` pour connaître les conditions d'utilisation, de modification et de distribution du projet.
