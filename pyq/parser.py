@@ -476,7 +476,13 @@ class Parser:
 
         if token.type == "NUMBER":
             self.advance()
-            return NumberLiteral(int(token.value))
+
+            if "." in token.value:
+                value = float(token.value)
+            else:
+                value = int(token.value)
+
+            return NumberLiteral(value)
 
         if token.type == "IDENTIFIER":
             self.advance()
