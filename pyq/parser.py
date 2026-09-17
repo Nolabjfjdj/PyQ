@@ -3,6 +3,7 @@ from .ast import (
     StringLiteral,
     NumberLiteral,
     BooleanLiteral,
+    NullLiteral,
     Identifier,
     ListLiteral,
     ListAccess,
@@ -492,6 +493,9 @@ class Parser:
 
             if token.value == "faux":
                 return BooleanLiteral(False)
+
+            if token.value == "nul":
+                return NullLiteral()
 
             if self.current().type == "LPAREN":
                 self.advance()
