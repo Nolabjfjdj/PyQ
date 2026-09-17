@@ -34,8 +34,40 @@ class Lexer:
                 continue
 
             if char == "=":
-                tokens.append(Token("EQUALS", "=", self.position))
-                self.position += 1
+                if self._peek("="):
+                    tokens.append(Token("EQUALS_EQUALS", "==", self.position))
+                    self.position += 2
+                else:
+                    tokens.append(Token("EQUALS", "=", self.position))
+                    self.position += 1
+                continue
+
+            if char == "!":
+                if self._peek("="):
+                    tokens.append(Token("NOT_EQUALS", "!=", self.position))
+                    self.position += 2
+                    continue
+
+                raise SyntaxError(
+                    f"Caractère inattendu à la position {self.position}: !"
+                )
+
+            if char == ">":
+                if self._peek("="):
+                    tokens.append(Token("GREATER_EQUALS", ">=", self.position))
+                    self.position += 2
+                else:
+                    tokens.append(Token("GREATER", ">", self.position))
+                    self.position += 1
+                continue
+
+            if char == "<":
+                if self._peek("="):
+                    tokens.append(Token("LESS_EQUALS", "<=", self.position))
+                    self.position += 2
+                else:
+                    tokens.append(Token("LESS", "<", self.position))
+                    self.position += 1
                 continue
 
             if char == "+":
@@ -76,6 +108,14 @@ class Lexer:
 
         tokens.append(Token("EOF", "", self.position))
         return tokens
+
+    def _peek(self, expected):
+        next_position = self.position + 1
+
+        return (
+            next_position < len(self.source)
+            and self.source[next_position] == expected
+        )
 
     def _read_string(self):
         start = self.position
