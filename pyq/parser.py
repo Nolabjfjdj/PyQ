@@ -89,24 +89,34 @@ class Parser:
             self.error("instruction invalide", token)
 
         if token.value == "si":
-            statement = self.parse_if()
-            return self.mark_line(statement, token.position)
+            return self.mark_line(
+                self.parse_if(),
+                token.position
+            )
 
         if token.value == "tantque":
-            statement = self.parse_while()
-            return self.mark_line(statement, token.position)
+            return self.mark_line(
+                self.parse_while(),
+                token.position
+            )
 
         if token.value == "pour":
-            statement = self.parse_for()
-            return self.mark_line(statement, token.position)
+            return self.mark_line(
+                self.parse_for(),
+                token.position
+            )
 
         if token.value == "fonction":
-            statement = self.parse_function_definition()
-            return self.mark_line(statement, token.position)
+            return self.mark_line(
+                self.parse_function_definition(),
+                token.position
+            )
 
         if token.value == "retourner":
-            statement = self.parse_return()
-            return self.mark_line(statement, token.position)
+            return self.mark_line(
+                self.parse_return(),
+                token.position
+            )
 
         if token.value == "interrompre":
             self.advance()
@@ -114,9 +124,8 @@ class Parser:
             if self.current().type == "NEWLINE":
                 self.advance()
 
-            return self.mark_line(
-                BreakStatement(),
-                token.position
+            return BreakStatement(
+                line=token.position
             )
 
         if token.value == "continuer":
@@ -125,9 +134,8 @@ class Parser:
             if self.current().type == "NEWLINE":
                 self.advance()
 
-            return self.mark_line(
-                ContinueStatement(),
-                token.position
+            return ContinueStatement(
+                line=token.position
             )
 
         if token.value == "sinon":
@@ -200,17 +208,23 @@ class Parser:
         )
 
     def parse_return(self):
-        self.expect("IDENTIFIER")
+        token = self.expect("IDENTIFIER")
 
         if self.current().type in ("NEWLINE", "DEDENT", "EOF"):
-            return ReturnStatement(None)
+            return ReturnStatement(
+                None,
+                line=token.position
+            )
 
         value = self.parse_expression()
 
         if self.current().type == "NEWLINE":
             self.advance()
 
-        return ReturnStatement(value)
+        return ReturnStatement(
+            value,
+            line=token.position
+        )
 
     def parse_if(self):
         self.expect("IDENTIFIER")
@@ -345,7 +359,10 @@ class Parser:
 
         value = self.parse_expression()
 
-        return VariableAssignment(name, value)
+        return VariableAssignment(
+            name,
+            value
+        )
 
     def parse_index_assignment(self):
         name = self.expect("IDENTIFIER").value
@@ -400,14 +417,15 @@ class Parser:
             self.current().type == "IDENTIFIER"
             and self.current().value == "ou"
         ):
-            self.advance()
+            token = self.advance()
 
             right = self.parse_and()
 
             expression = LogicalOperation(
                 expression,
                 "ou",
-                right
+                right,
+                line=token.position
             )
 
         return expression
@@ -419,14 +437,15 @@ class Parser:
             self.current().type == "IDENTIFIER"
             and self.current().value == "et"
         ):
-            self.advance()
+            token = self.advance()
 
             right = self.parse_comparison()
 
             expression = LogicalOperation(
                 expression,
                 "et",
-                right
+                right,
+                line=token.position
             )
 
         return expression
@@ -444,13 +463,14 @@ class Parser:
         }
 
         while self.current().type in comparison_operators:
-            operator = self.advance().value
+            token = self.advance()
             right = self.parse_unary()
 
             expression = Comparison(
                 expression,
-                operator,
-                right
+                token.value,
+                right,
+                line=token.position
             )
 
         return expression
@@ -460,13 +480,14 @@ class Parser:
             self.current().type == "IDENTIFIER"
             and self.current().value == "non"
         ):
-            self.advance()
+            token = self.advance()
 
             operand = self.parse_unary()
 
             return UnaryOperation(
                 "non",
-                operand
+                operand,
+                line=token.position
             )
 
         return self.parse_addition()
@@ -475,13 +496,14 @@ class Parser:
         expression = self.parse_multiplication()
 
         while self.current().type in ("PLUS", "MINUS"):
-            operator = self.advance().value
+            token = self.advance()
             right = self.parse_multiplication()
 
             expression = BinaryOperation(
                 expression,
-                operator,
-                right
+                token.value,
+                right,
+                line=token.position
             )
 
         return expression
@@ -490,13 +512,14 @@ class Parser:
         expression = self.parse_primary()
 
         while self.current().type in ("STAR", "SLASH"):
-            operator = self.advance().value
+            token = self.advance()
             right = self.parse_primary()
 
             expression = BinaryOperation(
                 expression,
-                operator,
-                right
+                token.value,
+                right,
+                line=token.position
             )
 
         return expression
@@ -506,7 +529,12 @@ class Parser:
 
         if token.type == "STRING":
             self.advance()
-            expression = StringLiteral(token.value)
+
+            expression = StringLiteral(
+                token.value,
+                line=token.position
+            )
+
             return self.parse_postfix(expression)
 
         if token.type == "NUMBER":
@@ -517,20 +545,32 @@ class Parser:
             else:
                 value = int(token.value)
 
-            expression = NumberLiteral(value)
+            expression = NumberLiteral(
+                value,
+                line=token.position
+            )
+
             return self.parse_postfix(expression)
 
         if token.type == "IDENTIFIER":
             self.advance()
 
             if token.value == "vrai":
-                expression = BooleanLiteral(True)
+                expression = BooleanLiteral(
+                    True,
+                    line=token.position
+                )
 
             elif token.value == "faux":
-                expression = BooleanLiteral(False)
+                expression = BooleanLiteral(
+                    False,
+                    line=token.position
+                )
 
             elif token.value == "nul":
-                expression = NullLiteral()
+                expression = NullLiteral(
+                    line=token.position
+                )
 
             elif self.current().type == "LPAREN":
                 self.advance()
@@ -550,11 +590,15 @@ class Parser:
 
                 expression = FunctionCall(
                     token.value,
-                    arguments
+                    arguments,
+                    line=token.position
                 )
 
             else:
-                expression = Identifier(token.value)
+                expression = Identifier(
+                    token.value,
+                    line=token.position
+                )
 
             return self.parse_postfix(expression)
 
@@ -583,7 +627,7 @@ class Parser:
     def parse_postfix(self, expression):
         while True:
             if self.current().type == "LBRACKET":
-                self.advance()
+                token = self.advance()
 
                 index = self.parse_expression()
 
@@ -591,13 +635,14 @@ class Parser:
 
                 expression = IndexAccess(
                     expression,
-                    index
+                    index,
+                    line=token.position
                 )
 
                 continue
 
             if self.current().type == "DOT":
-                self.advance()
+                token = self.advance()
 
                 name = self.expect("IDENTIFIER").value
 
@@ -619,7 +664,8 @@ class Parser:
                 expression = MethodCall(
                     expression,
                     name,
-                    arguments
+                    arguments,
+                    line=token.position
                 )
 
                 continue
@@ -632,7 +678,7 @@ class Parser:
         return self.parse_postfix(expression)
 
     def parse_list(self):
-        self.expect("LBRACKET")
+        token = self.expect("LBRACKET")
 
         elements = []
 
@@ -652,10 +698,13 @@ class Parser:
 
         self.expect("RBRACKET")
 
-        return ListLiteral(elements)
+        return ListLiteral(
+            elements,
+            line=token.position
+        )
 
     def parse_dict(self):
-        self.expect("LBRACE")
+        token = self.expect("LBRACE")
 
         entries = []
 
@@ -685,4 +734,7 @@ class Parser:
 
         self.expect("RBRACE")
 
-        return DictLiteral(entries)
+        return DictLiteral(
+            entries,
+            line=token.position
+        )
