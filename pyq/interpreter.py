@@ -17,12 +17,22 @@ from .ast import (
     IfStatement,
     WhileStatement,
     ForStatement,
+    BreakStatement,
+    ContinueStatement,
 )
 
 
 class ReturnSignal(Exception):
     def __init__(self, value):
         self.value = value
+
+
+class BreakSignal(Exception):
+    pass
+
+
+class ContinueSignal(Exception):
+    pass
 
 
 class Interpreter:
@@ -68,6 +78,12 @@ class Interpreter:
                 value = self.evaluate(statement.value)
 
             raise ReturnSignal(value)
+
+        if isinstance(statement, BreakStatement):
+            raise BreakSignal()
+
+        if isinstance(statement, ContinueStatement):
+            raise ContinueSignal()
 
         if isinstance(statement, IfStatement):
             return self.execute_if(statement)
@@ -196,8 +212,15 @@ class Interpreter:
 
     def execute_while(self, statement):
         while self.evaluate(statement.condition):
-            for instruction in statement.body:
-                self.execute_statement(instruction)
+            try:
+                for instruction in statement.body:
+                    self.execute_statement(instruction)
+
+            except ContinueSignal:
+                continue
+
+            except BreakSignal:
+                break
 
     def execute_for(self, statement):
         iterable = self.evaluate(statement.iterable)
@@ -213,8 +236,15 @@ class Interpreter:
             else:
                 self.variables[statement.variable] = value
 
-            for instruction in statement.body:
-                self.execute_statement(instruction)
+            try:
+                for instruction in statement.body:
+                    self.execute_statement(instruction)
+
+            except ContinueSignal:
+                continue
+
+            except BreakSignal:
+                break
 
     def evaluate(self, node):
         if isinstance(node, StringLiteral):
