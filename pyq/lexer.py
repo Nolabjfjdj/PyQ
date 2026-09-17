@@ -100,6 +100,21 @@ class Lexer:
                 self.position += 1
                 continue
 
+            if char == "[":
+                tokens.append(Token("LBRACKET", "[", self.position))
+                self.position += 1
+                continue
+
+            if char == "]":
+                tokens.append(Token("RBRACKET", "]", self.position))
+                self.position += 1
+                continue
+
+            if char == ",":
+                tokens.append(Token("COMMA", ",", self.position))
+                self.position += 1
+                continue
+
             if char == "=":
                 if self._peek("="):
                     tokens.append(
