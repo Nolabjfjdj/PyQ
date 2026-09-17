@@ -121,6 +121,9 @@ class Parser:
         elif next_token.type == "LBRACKET":
             statement = self.parse_index_assignment()
 
+        elif next_token.type == "DOT":
+            statement = self.parse_expression()
+
         else:
             statement = self.parse_function_call()
 
