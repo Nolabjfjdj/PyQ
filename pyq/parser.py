@@ -9,6 +9,8 @@ from .ast import (
     FunctionCall,
     VariableAssignment,
     ListAssignment,
+    FunctionDefinition,
+    ReturnStatement,
     BinaryOperation,
     Comparison,
     LogicalOperation,
@@ -75,17 +77,23 @@ class Parser:
         if token.value == "tantque":
             return self.parse_while()
 
+        if token.value == "fonction":
+            return self.parse_function_definition()
+
+        if token.value == "retourner":
+            return self.parse_return()
+
         if token.value == "sinon":
             raise SyntaxError(
                 f"'sinon' inattendu à la position {token.position}"
             )
 
-        if self.tokens[self.position + 1].type == "EQUALS":
+        next_token = self.tokens[self.position + 1]
+
+        if next_token.type == "EQUALS":
             statement = self.parse_assignment()
 
-        elif (
-            self.tokens[self.position + 1].type == "LBRACKET"
-        ):
+        elif next_token.type == "LBRACKET":
             statement = self.parse_list_assignment()
 
         else:
@@ -95,6 +103,60 @@ class Parser:
             self.advance()
 
         return statement
+
+    def parse_function_definition(self):
+        self.expect("IDENTIFIER")
+
+        name = self.expect("IDENTIFIER").value
+
+        self.expect("LPAREN")
+
+        parameters = []
+
+        if self.current().type != "RPAREN":
+            while True:
+                parameter = self.expect("IDENTIFIER").value
+                parameters.append(parameter)
+
+                if self.current().type != "COMMA":
+                    break
+
+                self.advance()
+
+        self.expect("RPAREN")
+        self.expect("COLON")
+        self.expect("NEWLINE")
+        self.expect("INDENT")
+
+        body = []
+
+        self.skip_newlines()
+
+        while self.current().type not in ("DEDENT", "EOF"):
+            body.append(self.parse_statement())
+            self.skip_newlines()
+
+        if self.current().type == "DEDENT":
+            self.advance()
+
+        return FunctionDefinition(
+            name,
+            parameters,
+            body
+        )
+
+    def parse_return(self):
+        self.expect("IDENTIFIER")
+
+        if self.current().type in ("NEWLINE", "DEDENT", "EOF"):
+            return ReturnStatement(None)
+
+        value = self.parse_expression()
+
+        if self.current().type == "NEWLINE":
+            self.advance()
+
+        return ReturnStatement(value)
 
     def parse_if(self):
         self.expect("IDENTIFIER")
@@ -180,7 +242,7 @@ class Parser:
         return VariableAssignment(name, value)
 
     def parse_list_assignment(self):
-        name = self.expect("IDENTIFIER").value
+        list_name = self.expect("IDENTIFIER").value
 
         self.expect("LBRACKET")
 
@@ -192,7 +254,7 @@ class Parser:
         value = self.parse_expression()
 
         return ListAssignment(
-            Identifier(name),
+            Identifier(list_name),
             index,
             value
         )
@@ -202,11 +264,23 @@ class Parser:
 
         self.expect("LPAREN")
 
-        argument = self.parse_expression()
+        arguments = []
+
+        if self.current().type != "RPAREN":
+            while True:
+                arguments.append(self.parse_expression())
+
+                if self.current().type != "COMMA":
+                    break
+
+                self.advance()
 
         self.expect("RPAREN")
 
-        return FunctionCall(name, argument)
+        return FunctionCall(
+            name,
+            arguments
+        )
 
     def parse_expression(self):
         return self.parse_or()
@@ -339,7 +413,29 @@ class Parser:
             if token.value == "faux":
                 return BooleanLiteral(False)
 
-            expression = Identifier(token.value)
+            if self.current().type == "LPAREN":
+                self.advance()
+
+                arguments = []
+
+                if self.current().type != "RPAREN":
+                    while True:
+                        arguments.append(self.parse_expression())
+
+                        if self.current().type != "COMMA":
+                            break
+
+                        self.advance()
+
+                self.expect("RPAREN")
+
+                expression = FunctionCall(
+                    token.value,
+                    arguments
+                )
+
+            else:
+                expression = Identifier(token.value)
 
             while self.current().type == "LBRACKET":
                 self.advance()
