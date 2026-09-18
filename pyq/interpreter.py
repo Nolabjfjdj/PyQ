@@ -416,6 +416,15 @@ class Interpreter:
 
                 return target.isalnum()
 
+            if node.name == "est_espace":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "est_espace() n'attend aucun argument",
+                        node
+                    )
+
+                return target.isspace()
+
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
             node
