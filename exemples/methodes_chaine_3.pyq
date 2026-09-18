@@ -1,9 +1,0 @@
-texte = "Bonjour Nolan"
-
-afficher(texte.remplacer("Nolan", "PyQ"))
-afficher(texte.remplacer("Bonjour", "Salut"))
-
-phrase = "un deux un deux"
-
-afficher(phrase.remplacer("un", "trois"))
-afficher(phrase.remplacer(" ", "-"))
