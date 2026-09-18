@@ -1,0 +1,9 @@
+texte = “Bonjour PyQ”
+
+afficher(texte.majuscule())
+afficher(texte.minuscule())
+
+message = “SALUT TOUT LE MONDE”
+
+afficher(message.majuscule())
+afficher(message.minuscule())
