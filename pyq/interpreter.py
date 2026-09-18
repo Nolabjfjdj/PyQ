@@ -407,6 +407,15 @@ class Interpreter:
 
                 return target.isupper()
 
+            if node.name == "est_alphanumerique":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "est_alphanumerique() n'attend aucun argument",
+                        node
+                    )
+
+                return target.isalnum()
+
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
             node
