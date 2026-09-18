@@ -1,0 +1,15 @@
+texte = "   "
+
+afficher(texte.est_espace())
+
+texte = "Bonjour"
+
+afficher(texte.est_espace())
+
+texte = "Bonjour monde"
+
+afficher(texte.est_espace())
+
+texte = ""
+
+afficher(texte.est_espace())
