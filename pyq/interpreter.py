@@ -401,6 +401,23 @@ class Interpreter:
 
                 return target.find(arguments[0])
 
+            if node.name == "position":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "position() attend exactement un argument",
+                        node
+                    )
+
+                position = target.find(arguments[0])
+
+                if position == -1:
+                    raise PyQRuntimeError(
+                        f"Texte introuvable : {arguments[0]}",
+                        node
+                    )
+
+                return position
+
             if node.name == "compter":
                 if len(arguments) != 1:
                     raise PyQRuntimeError(
