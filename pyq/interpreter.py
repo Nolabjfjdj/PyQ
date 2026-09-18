@@ -302,6 +302,30 @@ class Interpreter:
 
                 return target.split(arguments[0])
 
+            if node.name == "joindre":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "joindre() attend exactement un argument",
+                        node
+                    )
+
+                if not isinstance(arguments[0], list):
+                    raise PyQRuntimeError(
+                        "joindre() attend une liste",
+                        node
+                    )
+
+                try:
+                    return target.join(
+                        self.print_value(item)
+                        for item in arguments[0]
+                    )
+                except TypeError:
+                    raise PyQRuntimeError(
+                        "joindre() ne peut joindre que des chaînes",
+                        node
+                    )
+
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
                 node
