@@ -1,0 +1,5 @@
+texte = "un deux un trois un"
+
+afficher(texte.compter("un"))
+afficher(texte.compter("deux"))
+afficher(texte.compter("xyz"))
