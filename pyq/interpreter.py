@@ -281,6 +281,18 @@ class Interpreter:
 
                 return target.lower()
 
+            if node.name == "remplacer":
+                if len(arguments) != 2:
+                    raise PyQRuntimeError(
+                        "remplacer() attend exactement deux arguments",
+                        node
+                    )
+
+                return target.replace(
+                    arguments[0],
+                    arguments[1]
+                )
+
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
                 node
