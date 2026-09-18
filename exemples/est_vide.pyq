@@ -1,0 +1,11 @@
+texte = ""
+
+afficher(texte.est_vide())
+
+texte = "Bonjour"
+
+afficher(texte.est_vide())
+
+texte = " "
+
+afficher(texte.est_vide())
