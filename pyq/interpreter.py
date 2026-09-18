@@ -344,6 +344,21 @@ class Interpreter:
 
                 return target.strip(arguments[0])
 
+            if node.name == "chercher":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "chercher() attend exactement un argument",
+                        node
+                    )
+
+                if not isinstance(arguments[0], str):
+                    raise PyQRuntimeError(
+                        "chercher() attend une chaîne comme argument",
+                        node
+                    )
+
+                return target.find(arguments[0])
+
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
                 node
