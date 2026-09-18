@@ -1,0 +1,15 @@
+texte = "bonjour"
+
+afficher(texte.est_minuscule())
+
+texte = "Bonjour"
+
+afficher(texte.est_minuscule())
+
+texte = "BONJOUR"
+
+afficher(texte.est_minuscule())
+
+texte = "123"
+
+afficher(texte.est_minuscule())
