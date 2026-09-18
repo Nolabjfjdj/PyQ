@@ -1,0 +1,13 @@
+texte = "Bonjour tout le monde"
+
+mots = texte.separer(" ")
+
+afficher(mots)
+afficher(mots[0])
+afficher(mots[2])
+
+phrase = "un-deux-trois"
+
+parties = phrase.separer("-")
+
+afficher(parties)
