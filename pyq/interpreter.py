@@ -305,6 +305,15 @@ class Interpreter:
 
                 return target.title()
 
+            if node.name == "inverser":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "inverser() n'attend aucun argument",
+                        node
+                    )
+
+                return target[::-1]
+
             if node.name == "remplacer":
                 if len(arguments) != 2:
                     raise PyQRuntimeError(
