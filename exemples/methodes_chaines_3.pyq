@@ -1,9 +1,13 @@
-texte = "Bonjour Nolan"
+texte = "Bonjour tout le monde"
 
-afficher(texte.remplacer("Nolan", "PyQ"))
-afficher(texte.remplacer("Bonjour", "Salut"))
+mots = texte.separer(" ")
 
-phrase = "un deux un deux"
+afficher(mots)
+afficher(mots[0])
+afficher(mots[2])
 
-afficher(phrase.remplacer("un", "trois"))
-afficher(phrase.remplacer(" ", "-"))
+phrase = "un-deux-trois"
+
+parties = phrase.separer("-")
+
+afficher(parties)
