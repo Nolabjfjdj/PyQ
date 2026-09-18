@@ -1,0 +1,15 @@
+texte = "12345"
+
+afficher(texte.est_entier())
+
+texte = "Bonjour"
+
+afficher(texte.est_entier())
+
+texte = "123abc"
+
+afficher(texte.est_entier())
+
+texte = ""
+
+afficher(texte.est_entier())
