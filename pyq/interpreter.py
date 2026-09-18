@@ -1,17 +1,18 @@
 from pyq.ast import (
     Program,
-    NumberLiteral,
     StringLiteral,
+    NumberLiteral,
     BooleanLiteral,
     NullLiteral,
+    Identifier,
     ListLiteral,
     DictLiteral,
-    Identifier,
     IndexAccess,
     MethodCall,
     FunctionCall,
-    Assignment,
-    FunctionDeclaration,
+    VariableAssignment,
+    IndexAssignment,
+    FunctionDefinition,
     ReturnStatement,
     BinaryOperation,
     Comparison,
@@ -101,23 +102,28 @@ class Interpreter:
 
         try:
             return method(node)
+
         except PyQRuntimeError:
             raise
+
         except KeyError as error:
             raise PyQRuntimeError(
                 f"Nom inconnu : {error.args[0]}",
                 node
             )
+
         except ZeroDivisionError:
             raise PyQRuntimeError(
                 "Division par zéro",
                 node
             )
+
         except TypeError as error:
             raise PyQRuntimeError(
                 f"Opération invalide : {error}",
                 node
             )
+
         except IndexError:
             raise PyQRuntimeError(
                 "Index hors limites",
@@ -132,10 +138,10 @@ class Interpreter:
 
         return result
 
-    def execute_NumberLiteral(self, node):
+    def execute_StringLiteral(self, node):
         return node.value
 
-    def execute_StringLiteral(self, node):
+    def execute_NumberLiteral(self, node):
         return node.value
 
     def execute_BooleanLiteral(self, node):
@@ -143,6 +149,16 @@ class Interpreter:
 
     def execute_NullLiteral(self, node):
         return None
+
+    def execute_Identifier(self, node):
+        try:
+            return self.environment.get(node.name)
+
+        except KeyError:
+            raise PyQRuntimeError(
+                f"Nom inconnu : {node.name}",
+                node
+            )
 
     def execute_ListLiteral(self, node):
         return [
@@ -156,18 +172,17 @@ class Interpreter:
         for key, value in node.entries:
             evaluated_key = self.execute(key)
             evaluated_value = self.execute(value)
-            result[evaluated_key] = evaluated_value
+
+            try:
+                result[evaluated_key] = evaluated_value
+
+            except TypeError:
+                raise PyQRuntimeError(
+                    "Clé de dictionnaire invalide",
+                    node
+                )
 
         return result
-
-    def execute_Identifier(self, node):
-        try:
-            return self.environment.get(node.name)
-        except KeyError:
-            raise PyQRuntimeError(
-                f"Nom inconnu : {node.name}",
-                node
-            )
 
     def execute_IndexAccess(self, node):
         target = self.execute(node.target)
@@ -204,13 +219,13 @@ class Interpreter:
             return target[index]
 
         if isinstance(target, dict):
-            try:
-                return target[index]
-            except KeyError:
+            if index not in target:
                 raise PyQRuntimeError(
                     f"Clé absente du dictionnaire : {index}",
                     node
                 )
+
+            return target[index]
 
         raise PyQRuntimeError(
             "Cet élément ne peut pas être indexé",
@@ -219,6 +234,7 @@ class Interpreter:
 
     def execute_MethodCall(self, node):
         target = self.execute(node.target)
+
         arguments = [
             self.execute(argument)
             for argument in node.arguments
@@ -253,6 +269,7 @@ class Interpreter:
 
                 try:
                     target.remove(arguments[0])
+
                 except ValueError:
                     raise PyQRuntimeError(
                         f"Élément absent de la liste : {arguments[0]}",
@@ -479,11 +496,18 @@ class Interpreter:
         )
 
     def execute_FunctionCall(self, node):
-        function = self.execute(node.callee)
+        try:
+            function = self.environment.get(node.name)
+
+        except KeyError:
+            raise PyQRuntimeError(
+                f"Fonction inconnue : {node.name}",
+                node
+            )
 
         if not isinstance(function, Function):
             raise PyQRuntimeError(
-                "Cet élément n'est pas une fonction",
+                f"{node.name} n'est pas une fonction",
                 node
             )
 
@@ -500,7 +524,9 @@ class Interpreter:
             for argument in node.arguments
         ]
 
-        function_environment = Environment(function.closure)
+        function_environment = Environment(
+            function.closure
+        )
 
         for parameter, argument in zip(
             function.parameters,
@@ -526,12 +552,60 @@ class Interpreter:
 
         return None
 
-    def execute_Assignment(self, node):
+    def execute_VariableAssignment(self, node):
         value = self.execute(node.value)
-        self.environment.set(node.name, value)
+
+        self.environment.set(
+            node.name,
+            value
+        )
+
         return value
 
-    def execute_FunctionDeclaration(self, node):
+    def execute_IndexAssignment(self, node):
+        target = self.execute(node.target)
+        index = self.execute(node.index)
+        value = self.execute(node.value)
+
+        if isinstance(target, list):
+            if not isinstance(index, int):
+                raise PyQRuntimeError(
+                    "L'index d'une liste doit être un entier",
+                    node
+                )
+
+            if index < 0 or index >= len(target):
+                raise PyQRuntimeError(
+                    f"Index de liste hors limites : {index}",
+                    node
+                )
+
+            target[index] = value
+            return value
+
+        if isinstance(target, dict):
+            try:
+                target[index] = value
+            except TypeError:
+                raise PyQRuntimeError(
+                    "Clé de dictionnaire invalide",
+                    node
+                )
+
+            return value
+
+        if isinstance(target, str):
+            raise PyQRuntimeError(
+                "Une chaîne ne peut pas être modifiée",
+                node
+            )
+
+        raise PyQRuntimeError(
+            "Cet élément ne peut pas être modifié avec un index",
+            node
+        )
+
+    def execute_FunctionDefinition(self, node):
         function = Function(
             node.name,
             node.parameters,
@@ -676,6 +750,7 @@ class Interpreter:
 
         try:
             iterator = iter(iterable)
+
         except TypeError:
             raise PyQRuntimeError(
                 "L'élément utilisé avec 'dans' n'est pas parcourable",
@@ -757,7 +832,11 @@ class Interpreter:
                     f"{self.format_value(item)}"
                 )
 
-            print("{" + ", ".join(items) + "}")
+            print(
+                "{" +
+                ", ".join(items) +
+                "}"
+            )
             return
 
         print(value)
@@ -794,6 +873,10 @@ class Interpreter:
                     f"{self.format_value(item)}"
                 )
 
-            return "{" + ", ".join(items) + "}"
+            return (
+                "{" +
+                ", ".join(items) +
+                "}"
+            )
 
         return str(value)
