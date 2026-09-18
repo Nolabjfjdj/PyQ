@@ -1,0 +1,15 @@
+texte = "Bonjour"
+
+afficher(texte.est_lettre())
+
+texte = "Bonjour123"
+
+afficher(texte.est_lettre())
+
+texte = "123"
+
+afficher(texte.est_lettre())
+
+texte = "Bonjour le monde"
+
+afficher(texte.est_lettre())
