@@ -541,6 +541,27 @@ class Interpreter:
                     else ""
                 )
 
+            if node.name == "retirer_debut":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "retirer_debut() attend exactement un argument",
+                        node
+                    )
+
+                if not isinstance(arguments[0], int):
+                    raise PyQRuntimeError(
+                        "retirer_debut() attend un entier",
+                        node
+                    )
+
+                if arguments[0] < 0:
+                    raise PyQRuntimeError(
+                        "retirer_debut() attend un entier positif ou nul",
+                        node
+                    )
+
+                return target[arguments[0]:]
+
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
             node
