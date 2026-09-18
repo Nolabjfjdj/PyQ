@@ -359,6 +359,21 @@ class Interpreter:
 
                 return target.find(arguments[0])
 
+            if node.name == "compter":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "compter() attend exactement un argument",
+                        node
+                    )
+
+                if not isinstance(arguments[0], str):
+                    raise PyQRuntimeError(
+                        "compter() attend une chaîne comme argument",
+                        node
+                    )
+
+                return target.count(arguments[0])
+
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
                 node
