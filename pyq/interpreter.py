@@ -315,16 +315,34 @@ class Interpreter:
                         node
                     )
 
-                try:
-                    return target.join(
-                        self.print_value(item)
-                        for item in arguments[0]
-                    )
-                except TypeError:
+                if not all(
+                    isinstance(item, str)
+                    for item in arguments[0]
+                ):
                     raise PyQRuntimeError(
                         "joindre() ne peut joindre que des chaînes",
                         node
                     )
+
+                return target.join(arguments[0])
+
+            if node.name == "rogner":
+                if len(arguments) > 1:
+                    raise PyQRuntimeError(
+                        "rogner() attend zéro ou un argument",
+                        node
+                    )
+
+                if len(arguments) == 0:
+                    return target.strip()
+
+                if not isinstance(arguments[0], str):
+                    raise PyQRuntimeError(
+                        "rogner() attend une chaîne comme argument",
+                        node
+                    )
+
+                return target.strip(arguments[0])
 
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
