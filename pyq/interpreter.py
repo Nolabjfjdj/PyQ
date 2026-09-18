@@ -175,7 +175,6 @@ class Interpreter:
 
             try:
                 result[evaluated_key] = evaluated_value
-
             except TypeError:
                 raise PyQRuntimeError(
                     "Clé de dictionnaire invalide",
@@ -269,7 +268,6 @@ class Interpreter:
 
                 try:
                     target.remove(arguments[0])
-
                 except ValueError:
                     raise PyQRuntimeError(
                         f"Élément absent de la liste : {arguments[0]}",
@@ -496,6 +494,21 @@ class Interpreter:
         )
 
     def execute_FunctionCall(self, node):
+        arguments = [
+            self.execute(argument)
+            for argument in node.arguments
+        ]
+
+        if node.name == "afficher":
+            if len(arguments) != 1:
+                raise PyQRuntimeError(
+                    "afficher() attend exactement un argument",
+                    node
+                )
+
+            self.print_value(arguments[0])
+            return None
+
         try:
             function = self.environment.get(node.name)
 
@@ -511,18 +524,13 @@ class Interpreter:
                 node
             )
 
-        if len(node.arguments) != len(function.parameters):
+        if len(arguments) != len(function.parameters):
             raise PyQRuntimeError(
                 f"La fonction {function.name} attend "
                 f"{len(function.parameters)} argument(s), "
-                f"mais {len(node.arguments)} ont été fournis",
+                f"mais {len(arguments)} ont été fournis",
                 node
             )
-
-        arguments = [
-            self.execute(argument)
-            for argument in node.arguments
-        ]
 
         function_environment = Environment(
             function.closure
@@ -879,4 +887,4 @@ class Interpreter:
                 "}"
             )
 
-        return str(value) 
+        return str(value)
