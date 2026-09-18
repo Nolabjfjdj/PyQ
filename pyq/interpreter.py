@@ -442,6 +442,15 @@ class Interpreter:
                 except ValueError:
                     return False
 
+            if node.name == "est_vide":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "est_vide() n'attend aucun argument",
+                        node
+                    )
+
+                return target == ""
+
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
             node
