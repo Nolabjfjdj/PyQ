@@ -1,0 +1,11 @@
+texte = "   Bonjour PyQ   "
+
+afficher(texte.rogner())
+
+texte = "---Bonjour PyQ---"
+
+afficher(texte.rogner("-"))
+
+texte = "...Bonjour..."
+
+afficher(texte.rogner("."))
