@@ -374,6 +374,15 @@ class Interpreter:
 
                 return target.count(arguments[0])
 
+            if node.name == "est_entier":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "est_entier() n'attend aucun argument",
+                        node
+                    )
+
+                return target.isdigit()
+
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
                 node
