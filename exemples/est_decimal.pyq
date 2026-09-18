@@ -1,0 +1,19 @@
+texte = "12.5"
+
+afficher(texte.est_decimal())
+
+texte = "12"
+
+afficher(texte.est_decimal())
+
+texte = "Bonjour"
+
+afficher(texte.est_decimal())
+
+texte = "12.5abc"
+
+afficher(texte.est_decimal())
+
+texte = ""
+
+afficher(texte.est_decimal())
