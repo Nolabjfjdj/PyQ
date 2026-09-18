@@ -1,0 +1,19 @@
+texte = "Bonjour123"
+
+afficher(texte.est_alphanumerique())
+
+texte = "Bonjour"
+
+afficher(texte.est_alphanumerique())
+
+texte = "12345"
+
+afficher(texte.est_alphanumerique())
+
+texte = "Bonjour 123"
+
+afficher(texte.est_alphanumerique())
+
+texte = "Bonjour-123"
+
+afficher(texte.est_alphanumerique())
