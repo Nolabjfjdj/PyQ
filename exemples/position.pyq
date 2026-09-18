@@ -1,0 +1,4 @@
+texte = "Bonjour Nolan"
+
+afficher(texte.position("Bonjour"))
+afficher(texte.position("Nolan"))
