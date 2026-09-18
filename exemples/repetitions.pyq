@@ -1,0 +1,5 @@
+texte = "PyQ"
+
+afficher(texte.repetitions(3))
+afficher(texte.repetitions(2))
+afficher("Ha".repetitions(4))
