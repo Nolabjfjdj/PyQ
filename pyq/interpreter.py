@@ -425,6 +425,23 @@ class Interpreter:
 
                 return target.isspace()
 
+            if node.name == "est_decimal":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "est_decimal() n'attend aucun argument",
+                        node
+                    )
+
+                if target == "":
+                    return False
+
+                try:
+                    float(target)
+                    return "." in target
+
+                except ValueError:
+                    return False
+
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
             node
