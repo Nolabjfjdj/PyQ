@@ -1,0 +1,5 @@
+texte = "Bonjour"
+
+afficher(texte.retirer_debut(3))
+afficher(texte.retirer_debut(5))
+afficher(texte.retirer_debut(0))
