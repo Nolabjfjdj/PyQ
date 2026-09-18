@@ -1,0 +1,3 @@
+texte = "Bonjour"
+
+afficher(texte.inverser())
