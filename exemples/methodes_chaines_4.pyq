@@ -1,13 +1,8 @@
-texte = "Bonjour tout le monde"
+mots = ["Bonjour", "tout", "le", "monde"]
 
-mots = texte.separer(" ")
+afficher(" ".joindre(mots))
+afficher("-".joindre(mots))
 
-afficher(mots)
-afficher(mots[0])
-afficher(mots[2])
+nombres = ["un", "deux", "trois"]
 
-phrase = "un-deux-trois"
-
-parties = phrase.separer("-")
-
-afficher(parties)
+afficher(", ".joindre(nombres))
