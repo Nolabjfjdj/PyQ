@@ -1,0 +1,6 @@
+texte = "Bonjour Nolan"
+
+afficher(texte.chercher("Nolan"))
+afficher(texte.chercher("Bonjour"))
+afficher(texte.chercher("Python"))
+afficher(texte.chercher("o"))
