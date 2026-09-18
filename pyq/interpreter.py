@@ -293,6 +293,15 @@ class Interpreter:
                     arguments[1]
                 )
 
+            if node.name == "separer":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "separer() attend exactement un argument",
+                        node
+                    )
+
+                return target.split(arguments[0])
+
             raise PyQRuntimeError(
                 f"Méthode de chaîne inconnue : {node.name}",
                 node
