@@ -1,0 +1,5 @@
+texte = "Bonjour"
+
+afficher(texte.fin(3))
+afficher(texte.fin(5))
+afficher(texte.fin(0))
