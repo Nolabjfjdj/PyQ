@@ -1,0 +1,11 @@
+texte = "bonjour tout le monde"
+
+afficher(texte.titre())
+
+texte = "bienvenue dans pyq"
+
+afficher(texte.titre())
+
+texte = "SALUT TOUT LE MONDE"
+
+afficher(texte.titre())
