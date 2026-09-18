@@ -451,6 +451,21 @@ class Interpreter:
 
                 return target == ""
 
+            if node.name == "debut":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "debut() attend exactement un argument",
+                        node
+                    )
+
+                if not isinstance(arguments[0], int):
+                    raise PyQRuntimeError(
+                        "debut() attend un entier",
+                        node
+                    )
+
+                return target[:arguments[0]]
+
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
             node
