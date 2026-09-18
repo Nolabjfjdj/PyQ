@@ -314,6 +314,27 @@ class Interpreter:
 
                 return target[::-1]
 
+            if node.name == "repetitions":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError(
+                        "repetitions() attend exactement un argument",
+                        node
+                    )
+
+                if not isinstance(arguments[0], int):
+                    raise PyQRuntimeError(
+                        "repetitions() attend un entier",
+                        node
+                    )
+
+                if arguments[0] < 0:
+                    raise PyQRuntimeError(
+                        "repetitions() attend un entier positif ou nul",
+                        node
+                    )
+
+                return target * arguments[0]
+
             if node.name == "remplacer":
                 if len(arguments) != 2:
                     raise PyQRuntimeError(
