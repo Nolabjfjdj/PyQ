@@ -296,6 +296,15 @@ class Interpreter:
 
                 return target.lower()
 
+            if node.name == "titre":
+                if len(arguments) != 0:
+                    raise PyQRuntimeError(
+                        "titre() n'attend aucun argument",
+                        node
+                    )
+
+                return target.title()
+
             if node.name == "remplacer":
                 if len(arguments) != 2:
                     raise PyQRuntimeError(
@@ -479,7 +488,11 @@ class Interpreter:
                         node
                     )
 
-                return target[-arguments[0]:] if arguments[0] != 0 else ""
+                return (
+                    target[-arguments[0]:]
+                    if arguments[0] != 0
+                    else ""
+                )
 
         raise PyQRuntimeError(
             f"Méthode inconnue : {node.name}",
