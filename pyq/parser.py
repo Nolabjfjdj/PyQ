@@ -490,6 +490,28 @@ class Parser:
                 line=token.position
             )
 
+        if self.current().type == "MINUS":
+            token = self.advance()
+
+            operand = self.parse_unary()
+
+            return UnaryOperation(
+                "-",
+                operand,
+                line=token.position
+            )
+
+        if self.current().type == "PLUS":
+            token = self.advance()
+
+            operand = self.parse_unary()
+
+            return UnaryOperation(
+                "+",
+                operand,
+                line=token.position
+            )
+
         return self.parse_addition()
 
     def parse_addition(self):
