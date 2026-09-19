@@ -1,0 +1,15 @@
+texte = "Bonjour"
+
+afficher(texte[0:3])
+afficher(texte[2:])
+afficher(texte[:4])
+afficher(texte[1:6:2])
+afficher(texte[::-1])
+
+nombres = [10, 20, 30, 40, 50]
+
+afficher(nombres[1:4])
+afficher(nombres[:3])
+afficher(nombres[2:])
+afficher(nombres[::2])
+afficher(nombres[::-1])
