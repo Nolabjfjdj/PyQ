@@ -1,0 +1,18 @@
+nombres = [10, 20, 30]
+
+afficher(20 dans nombres)
+afficher(50 dans nombres)
+afficher(50 pas dans nombres)
+
+texte = "Bonjour"
+
+afficher("jour" dans texte)
+afficher("xyz" pas dans texte)
+
+profil = {
+    "nom": "Nolan",
+    "age": 14
+}
+
+afficher("nom" dans profil)
+afficher("ville" pas dans profil)
