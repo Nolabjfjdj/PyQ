@@ -68,6 +68,15 @@ class MethodCall(Node):
 
 
 @dataclass
+class SliceAccess(Node):
+    target: Node
+    start: Node | None = None
+    end: Node | None = None
+    step: Node | None = None
+    line: int | None = None
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     arguments: list
@@ -165,4 +174,3 @@ class BreakStatement(Node):
 @dataclass
 class ContinueStatement(Node):
     line: int | None = None
-    
