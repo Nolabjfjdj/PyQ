@@ -200,6 +200,13 @@ class Lexer:
                 i += 2
                 continue
 
+            if line.startswith("//", i):
+                self.tokens.append(
+                    Token("DOUBLE_SLASH", "//", line_number)
+                )
+                i += 2
+                continue
+
             single_tokens = {
                 "=": "EQUALS",
                 ">": "GREATER",
@@ -208,7 +215,6 @@ class Lexer:
                 "-": "MINUS",
                 "*": "STAR",
                 "/": "SLASH",
-                "%": "PERCENT",
                 ":": "COLON",
                 "(": "LPAREN",
                 ")": "RPAREN",
@@ -248,4 +254,3 @@ class Lexer:
             raise SyntaxError(
                 f"Caractère inattendu '{char}' à la ligne {line_number}"
             ) 
-
