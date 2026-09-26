@@ -1,0 +1,9 @@
+afficher(17 % 5)
+
+a = 20
+b = 6
+
+afficher(a % b)
+
+afficher(10 + 7 % 3)
+afficher((10 + 7) % 3)
