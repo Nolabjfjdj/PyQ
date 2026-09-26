@@ -8,6 +8,7 @@ from .ast import (
     ListLiteral,
     DictLiteral,
     IndexAccess,
+    SliceAccess,
     MethodCall,
     FunctionCall,
     VariableAssignment,
@@ -651,7 +652,69 @@ class Parser:
             if self.current().type == "LBRACKET":
                 token = self.advance()
 
+                if self.current().type == "COLON":
+                    start = None
+                    self.advance()
+
+                    if self.current().type not in ("COLON", "RBRACKET"):
+                        end = self.parse_expression()
+                    else:
+                        end = None
+
+                    if self.current().type == "COLON":
+                        self.advance()
+
+                        if self.current().type != "RBRACKET":
+                            step = self.parse_expression()
+                        else:
+                            step = None
+                    else:
+                        step = None
+
+                    self.expect("RBRACKET")
+
+                    expression = SliceAccess(
+                        expression,
+                        start,
+                        end,
+                        step,
+                        line=token.position
+                    )
+
+                    continue
+
                 index = self.parse_expression()
+
+                if self.current().type == "COLON":
+                    start = index
+                    self.advance()
+
+                    if self.current().type not in ("COLON", "RBRACKET"):
+                        end = self.parse_expression()
+                    else:
+                        end = None
+
+                    if self.current().type == "COLON":
+                        self.advance()
+
+                        if self.current().type != "RBRACKET":
+                            step = self.parse_expression()
+                        else:
+                            step = None
+                    else:
+                        step = None
+
+                    self.expect("RBRACKET")
+
+                    expression = SliceAccess(
+                        expression,
+                        start,
+                        end,
+                        step,
+                        line=token.position
+                    )
+
+                    continue
 
                 self.expect("RBRACKET")
 
