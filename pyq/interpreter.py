@@ -8,6 +8,7 @@ from pyq.ast import (
     ListLiteral,
     DictLiteral,
     IndexAccess,
+    SliceAccess,
     MethodCall,
     FunctionCall,
     VariableAssignment,
@@ -192,6 +193,59 @@ class Interpreter:
 
             raise PyQRuntimeError(
                 "Indexation impossible sur cette valeur",
+                node
+            )
+
+    def execute_SliceAccess(self, node):
+        target = self.execute(node.target)
+
+        start = (
+            self.execute(node.start)
+            if node.start is not None
+            else None
+        )
+
+        end = (
+            self.execute(node.end)
+            if node.end is not None
+            else None
+        )
+
+        step = (
+            self.execute(node.step)
+            if node.step is not None
+            else None
+        )
+
+        for name, value in (
+            ("début", start),
+            ("fin", end),
+            ("pas", step),
+        ):
+            if value is not None and not isinstance(value, int):
+                raise PyQRuntimeError(
+                    f"L'indice de {name} doit être un entier",
+                    node
+                )
+
+        if step == 0:
+            raise PyQRuntimeError(
+                "Le pas d'une tranche ne peut pas être zéro",
+                node
+            )
+
+        if not isinstance(target, (str, list)):
+            raise PyQRuntimeError(
+                "La découpe est disponible uniquement pour les chaînes et les listes",
+                node
+            )
+
+        try:
+            return target[slice(start, end, step)]
+
+        except (TypeError, ValueError):
+            raise PyQRuntimeError(
+                "Découpe impossible avec ces indices",
                 node
             )
 
@@ -792,9 +846,9 @@ class Interpreter:
         if node.operator == "non":
             return not self.is_truthy(operand)
 
-        if node.operator == "-":
+        if node.operator in ("-", "+"):
             try:
-                return -operand
+                return -operand if node.operator == "-" else +operand
 
             except TypeError:
                 raise PyQRuntimeError(
