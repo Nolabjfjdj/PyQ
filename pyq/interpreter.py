@@ -766,8 +766,8 @@ class Interpreter:
             if node.operator == "/":
                 return left / right
 
-            if node.operator == "%":
-                return left % right
+            if node.operator == "//":
+                return left // right
 
         except (TypeError, ZeroDivisionError) as error:
             if isinstance(error, ZeroDivisionError):
