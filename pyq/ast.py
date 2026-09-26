@@ -91,6 +91,14 @@ class VariableAssignment(Node):
 
 
 @dataclass
+class CompoundAssignment(Node):
+    name: str
+    operator: str
+    value: Node
+    line: int | None = None
+
+
+@dataclass
 class IndexAssignment(Node):
     target: Node
     index: Node
