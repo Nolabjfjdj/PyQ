@@ -200,17 +200,48 @@ class Lexer:
                 i += 2
                 continue
 
+            if line.startswith("//=", i):
+                self.tokens.append(Token("DOUBLE_SLASH_EQUALS", "//=", line_number))
+                i += 3
+                continue
+
+            if line.startswith("**=", i):
+                self.tokens.append(Token("DOUBLE_STAR_EQUALS", "**=", line_number))
+                i += 3
+                continue
+
+            if line.startswith("+=", i):
+                self.tokens.append(Token("PLUS_EQUALS", "+=", line_number))
+                i += 2
+                continue
+
+            if line.startswith("-=", i):
+                self.tokens.append(Token("MINUS_EQUALS", "-=", line_number))
+                i += 2
+                continue
+
+            if line.startswith("*=", i):
+                self.tokens.append(Token("STAR_EQUALS", "*=", line_number))
+                i += 2
+                continue
+
+            if line.startswith("/=", i):
+                self.tokens.append(Token("SLASH_EQUALS", "/=", line_number))
+                i += 2
+                continue
+
+            if line.startswith("%=", i):
+                self.tokens.append(Token("MODULO_EQUALS", "%=", line_number))
+                i += 2
+                continue
+
             if line.startswith("//", i):
-                self.tokens.append(
-                    Token("DOUBLE_SLASH", "//", line_number)
-                )
+                self.tokens.append(Token("DOUBLE_SLASH", "//", line_number))
                 i += 2
                 continue
 
             if line.startswith("**", i):
-                self.tokens.append(
-                    Token("DOUBLE_STAR", "**", line_number)
-                )
+                self.tokens.append(Token("DOUBLE_STAR", "**", line_number))
                 i += 2
                 continue
 
