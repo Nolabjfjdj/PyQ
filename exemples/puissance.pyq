@@ -1,0 +1,11 @@
+afficher(2 ** 3)
+afficher(5 ** 2)
+afficher(10 ** 0)
+
+afficher(2 + 3 ** 2)
+afficher((2 + 3) ** 2)
+
+afficher(2 ** 3 ** 2)
+
+afficher(17 % 5)
+afficher(17 // 5)
