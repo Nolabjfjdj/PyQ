@@ -208,6 +208,7 @@ class Lexer:
                 "-": "MINUS",
                 "*": "STAR",
                 "/": "SLASH",
+                "%": "PERCENT",
                 ":": "COLON",
                 "(": "LPAREN",
                 ")": "RPAREN",
