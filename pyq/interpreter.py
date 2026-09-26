@@ -12,6 +12,7 @@ from pyq.ast import (
     MethodCall,
     FunctionCall,
     VariableAssignment,
+    CompoundAssignment,
     IndexAssignment,
     FunctionDefinition,
     ReturnStatement,
@@ -697,6 +698,25 @@ class Interpreter:
         )
 
         return value
+
+    def execute_CompoundAssignment(self, node):
+        current = self.environment.get(node.name)
+        value = self.execute(node.value)
+        try:
+            if node.operator == "+": result = current + value
+            elif node.operator == "-": result = current - value
+            elif node.operator == "*": result = current * value
+            elif node.operator == "/": result = current / value
+            elif node.operator == "//": result = current // value
+            elif node.operator == "%": result = current % value
+            elif node.operator == "**": result = current ** value
+            else: raise PyQRuntimeError(f"Opérateur d'affectation inconnu : {node.operator}", node)
+        except ZeroDivisionError:
+            raise PyQRuntimeError("Division par zéro", node)
+        except TypeError:
+            raise PyQRuntimeError("Opération impossible entre ces valeurs", node)
+        self.environment.set(node.name, result)
+        return result
 
     def execute_IndexAssignment(self, node):
         target = self.execute(node.target)
