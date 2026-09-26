@@ -207,6 +207,13 @@ class Lexer:
                 i += 2
                 continue
 
+            if line.startswith("**", i):
+                self.tokens.append(
+                    Token("DOUBLE_STAR", "**", line_number)
+                )
+                i += 2
+                continue
+
             single_tokens = {
                 "=": "EQUALS",
                 ">": "GREATER",
@@ -215,6 +222,7 @@ class Lexer:
                 "-": "MINUS",
                 "*": "STAR",
                 "/": "SLASH",
+                "%": "MODULO",
                 ":": "COLON",
                 "(": "LPAREN",
                 ")": "RPAREN",
