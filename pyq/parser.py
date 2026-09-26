@@ -534,7 +534,7 @@ class Parser:
     def parse_multiplication(self):
         expression = self.parse_primary()
 
-        while self.current().type in ("STAR", "SLASH"):
+        while self.current().type in ("STAR", "SLASH", "PERCENT"):
             token = self.advance()
             right = self.parse_primary()
 
