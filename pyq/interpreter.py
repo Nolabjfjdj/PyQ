@@ -835,6 +835,12 @@ class Interpreter:
             if node.operator == "<=":
                 return left <= right
 
+            if node.operator == "dans":
+                return left in right
+
+            if node.operator == "pas dans":
+                return left not in right
+
         except TypeError:
             raise PyQRuntimeError(
                 "Comparaison impossible entre ces valeurs",
