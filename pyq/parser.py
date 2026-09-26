@@ -483,16 +483,58 @@ class Parser:
             "LESS_EQUALS",
         }
 
-        while self.current().type in comparison_operators:
-            token = self.advance()
-            right = self.parse_addition()
+        while True:
+            if self.current().type in comparison_operators:
+                token = self.advance()
+                right = self.parse_addition()
 
-            expression = Comparison(
-                expression,
-                token.value,
-                right,
-                line=token.position
-            )
+                expression = Comparison(
+                    expression,
+                    token.value,
+                    right,
+                    line=token.position
+                )
+                continue
+
+            if (
+                self.current().type == "IDENTIFIER"
+                and self.current().value == "dans"
+            ):
+                token = self.advance()
+                right = self.parse_addition()
+
+                expression = Comparison(
+                    expression,
+                    "dans",
+                    right,
+                    line=token.position
+                )
+                continue
+
+            if (
+                self.current().type == "IDENTIFIER"
+                and self.current().value == "pas"
+            ):
+                token = self.advance()
+
+                if (
+                    self.current().type != "IDENTIFIER"
+                    or self.current().value != "dans"
+                ):
+                    self.error("attendu dans après pas")
+
+                self.advance()
+                right = self.parse_addition()
+
+                expression = Comparison(
+                    expression,
+                    "pas dans",
+                    right,
+                    line=token.position
+                )
+                continue
+
+            break
 
         return expression
 
