@@ -452,7 +452,7 @@ class Parser:
         return expression
 
     def parse_comparison(self):
-        expression = self.parse_unary()
+        expression = self.parse_addition()
 
         comparison_operators = {
             "EQUALS_EQUALS",
@@ -465,7 +465,7 @@ class Parser:
 
         while self.current().type in comparison_operators:
             token = self.advance()
-            right = self.parse_unary()
+            right = self.parse_addition()
 
             expression = Comparison(
                 expression,
@@ -513,7 +513,7 @@ class Parser:
                 line=token.position
             )
 
-        return self.parse_addition()
+        return self.parse_power()
 
     def parse_addition(self):
         expression = self.parse_multiplication()
@@ -532,11 +532,27 @@ class Parser:
         return expression
 
     def parse_multiplication(self):
+        expression = self.parse_unary()
+
+        while self.current().type in ("STAR", "SLASH", "DOUBLE_SLASH", "MODULO"):
+            token = self.advance()
+            right = self.parse_unary()
+
+            expression = BinaryOperation(
+                expression,
+                token.value,
+                right,
+                line=token.position
+            )
+
+        return expression
+
+    def parse_power(self):
         expression = self.parse_primary()
 
-        while self.current().type in ("STAR", "SLASH", "DOUBLE_SLASH"):
+        if self.current().type == "DOUBLE_STAR":
             token = self.advance()
-            right = self.parse_primary()
+            right = self.parse_unary()
 
             expression = BinaryOperation(
                 expression,
