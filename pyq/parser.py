@@ -12,6 +12,7 @@ from .ast import (
     MethodCall,
     FunctionCall,
     VariableAssignment,
+    CompoundAssignment,
     IndexAssignment,
     FunctionDefinition,
     ReturnStatement,
@@ -149,6 +150,13 @@ class Parser:
 
         if next_token.type == "EQUALS":
             statement = self.parse_assignment()
+
+        elif next_token.type in (
+            "PLUS_EQUALS", "MINUS_EQUALS", "STAR_EQUALS",
+            "SLASH_EQUALS", "MODULO_EQUALS",
+            "DOUBLE_SLASH_EQUALS", "DOUBLE_STAR_EQUALS",
+        ):
+            statement = self.parse_compound_assignment()
 
         elif next_token.type == "LBRACKET":
             statement = self.parse_index_assignment()
@@ -364,6 +372,18 @@ class Parser:
             name,
             value
         )
+
+    def parse_compound_assignment(self):
+        name = self.expect("IDENTIFIER").value
+        token = self.advance()
+        operators = {
+            "PLUS_EQUALS": "+", "MINUS_EQUALS": "-",
+            "STAR_EQUALS": "*", "SLASH_EQUALS": "/",
+            "MODULO_EQUALS": "%", "DOUBLE_SLASH_EQUALS": "//",
+            "DOUBLE_STAR_EQUALS": "**",
+        }
+        value = self.parse_expression()
+        return CompoundAssignment(name, operators[token.type], value)
 
     def parse_index_assignment(self):
         name = self.expect("IDENTIFIER").value
