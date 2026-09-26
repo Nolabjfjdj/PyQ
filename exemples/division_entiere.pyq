@@ -1,0 +1,6 @@
+afficher(17 // 5)
+afficher(10 // 3)
+afficher(20 // 4)
+
+afficher(10 + 17 // 5)
+afficher((10 + 17) // 5)
