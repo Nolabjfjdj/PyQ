@@ -1,10 +1,24 @@
-# PyQ
+# PyQ 🇫🇷
 
 > **PyQ** est un langage de programmation indépendant, francophone et interprété, créé par **LaBanane415**.
 
-PyQ est conçu comme un véritable langage de programmation avec sa propre syntaxe, son lexer, son parser, son AST et son interpréteur.
+PyQ reprend de nombreux concepts de Python tout en proposant une syntaxe française.
 
-Python est utilisé uniquement pour développer l'interpréteur actuel de PyQ. Les programmes PyQ ne sont pas transformés en fichiers Python.
+L'objectif est simple :
+
+> **Python, mais en français.**
+
+Par exemple, en Python :
+
+    print("Bonjour le monde !")
+
+En PyQ :
+
+    afficher("Bonjour le monde !")
+
+PyQ possède sa propre syntaxe, son propre lexer, son propre parser, son propre AST et son propre interpréteur.
+
+Python est actuellement utilisé uniquement pour développer l'interpréteur de PyQ. Les programmes PyQ ne sont pas transformés en fichiers Python.
 
 ## ✨ Fonctionnalités
 
@@ -52,62 +66,77 @@ PyQ prend actuellement en charge :
 - Gestion des erreurs avec `essayer`, `sauf` et `enfin`
 - Messages d'erreur d'exécution avec numéro de ligne
 
-## 📁 Structure du projet
+## 🚀 Installation
 
-PyQ/
-├── README.md
-├── LICENSE
-├── pyq.py
-│
-├── exemples/
-│   ├── bonjour.pyq
-│   ├── nom.pyq
-│   ├── calcul.pyq
-│   ├── comparaisons.pyq
-│   ├── booleens.pyq
-│   ├── conditions.pyq
-│   ├── sinon.pyq
-│   ├── sinon_si.pyq
-│   ├── tantque.pyq
-│   ├── pour.pyq
-│   ├── interrompre_continuer.pyq
-│   ├── logique.pyq
-│   ├── listes.pyq
-│   ├── methodes_listes.pyq
-│   ├── dictionnaires.pyq
-│   ├── fonctions.pyq
-│   ├── commentaires.pyq
-│   ├── decimaux.pyq
-│   ├── nul.pyq
-│   ├── modulo.pyq
-│   ├── division_entiere.pyq
-│   ├── puissance.pyq
-│   ├── affectations.pyq
-│   ├── appartenance.pyq
-│   ├── identite.pyq
-│   ├── slicing.pyq
-│   ├── methodes_chaines.pyq
-│   ├── essayer_sauf_enfin.pyq
-│   └── stress_test.pyq
-│
-└── pyq/
-    ├── __init__.py
-    ├── lexer.py
-    ├── parser.py
-    ├── ast.py
-    └── interpreter.py
+PyQ fonctionne actuellement avec **Python**.
 
-## 🚀 Utilisation
+### Windows
 
-PyQ fonctionne actuellement avec Python.
+#### 1. Installer Python
 
-Pour exécuter un programme :
+Télécharge et installe Python depuis :
+
+https://www.python.org/downloads/
+
+Pendant l'installation, active l'option permettant d'ajouter Python au `PATH`.
+
+#### 2. Vérifier Python
+
+Ouvre **CMD** et exécute :
+
+    python --version
+
+Si une version de Python s'affiche, Python est correctement installé.
+
+#### 3. Télécharger PyQ
+
+Dans CMD :
+
+    git clone https://github.com/Nolabjfjdj/PyQ.git
+
+Puis entre dans le dossier :
+
+    cd PyQ
+
+#### 4. Exécuter PyQ
+
+Lance un exemple :
 
     python pyq.py exemples/bonjour.pyq
 
+Tu devrais obtenir :
+
+    Bonjour le monde !
+
+## ▶️ Exécuter un programme PyQ
+
+Depuis le dossier de PyQ :
+
+    python pyq.py chemin/vers/programme.pyq
+
+Par exemple :
+
+    python pyq.py exemples/bonjour.pyq
+
+Tu peux également créer ton propre fichier `.pyq`.
+
 Exemple :
 
-    afficher("Bonjour le monde !")
+    nom = "Monde"
+
+    afficher("Bonjour " + nom + " !")
+
+Puis l'exécuter :
+
+    python pyq.py monprogramme.pyq
+
+## 🐍 Python requis
+
+Pour le moment, PyQ utilise Python comme environnement d'exécution de son interpréteur.
+
+Python doit donc être installé pour exécuter PyQ.
+
+À terme, PyQ pourra évoluer vers une installation et une utilisation plus indépendantes.
 
 ## 📝 Syntaxe
 
@@ -154,8 +183,6 @@ Résultat :
     30
 
 ### Affectations composées
-
-PyQ permet de modifier une variable avec des opérateurs d'affectation composés :
 
     nombre = 10
 
@@ -235,8 +262,6 @@ Exemple :
 
 ### Appartenance
 
-PyQ permet de vérifier si une valeur appartient à une collection ou à une chaîne :
-
     nombres = [10, 20, 30]
 
     afficher(20 dans nombres)
@@ -244,7 +269,7 @@ PyQ permet de vérifier si une valeur appartient à une collection ou à une cha
 
 ### Identité
 
-PyQ prend en charge les opérateurs :
+PyQ prend en charge :
 
     est
     n'est pas
@@ -257,8 +282,6 @@ Exemple :
     afficher(valeur n'est pas nul)
 
 ### Conditions
-
-Une condition peut être écrite avec `si` :
 
     age = 14
 
@@ -278,8 +301,6 @@ Les blocs sont définis grâce à l'indentation.
 
 ### `sinon si`
 
-Plusieurs conditions peuvent être enchaînées avec `sinon si` :
-
     age = 14
 
     si age >= 18:
@@ -290,8 +311,6 @@ Plusieurs conditions peuvent être enchaînées avec `sinon si` :
         afficher("Enfant")
 
 ### Boucles `tantque`
-
-PyQ permet de répéter un bloc tant qu'une condition est vraie :
 
     compteur = 1
 
@@ -309,16 +328,12 @@ Résultat :
 
 ### Boucles `pour`
 
-PyQ permet de parcourir les éléments d'une collection avec `pour` et `dans` :
-
     nombres = [10, 20, 30]
 
     pour nombre dans nombres:
         afficher(nombre)
 
 ### `interrompre` et `continuer`
-
-`interrompre` permet de quitter une boucle et `continuer` permet de passer directement à l'itération suivante :
 
     compteur = 0
 
@@ -334,8 +349,6 @@ PyQ permet de parcourir les éléments d'une collection avec `pour` et `dans` :
         afficher(compteur)
 
 ### Listes
-
-PyQ permet de créer des listes :
 
     nombres = [10, 20, 30, 40]
 
@@ -356,8 +369,6 @@ Les listes peuvent également être imbriquées :
 
 ### Dictionnaires
 
-PyQ permet de créer des dictionnaires :
-
     utilisateur = {
         "nom": "Nolan",
         "age": 14
@@ -376,8 +387,6 @@ Les dictionnaires peuvent également être imbriqués.
 
 ### Méthodes de listes
 
-PyQ fournit notamment les méthodes suivantes pour les listes :
-
     nombres = [10, 20, 30]
 
     afficher(nombres.taille())
@@ -385,8 +394,6 @@ PyQ fournit notamment les méthodes suivantes pour les listes :
     nombres.retirer(20)
 
 ### Méthodes de chaînes
-
-PyQ fournit plusieurs méthodes pour manipuler les chaînes :
 
     texte = "Bonjour le monde"
 
@@ -413,8 +420,6 @@ Les méthodes disponibles incluent notamment :
 
 ### Indexation et tranches
 
-Les chaînes et les listes peuvent être découpées avec des tranches :
-
     nombres = [10, 20, 30, 40, 50]
 
     afficher(nombres[1:4])
@@ -425,8 +430,6 @@ Les chaînes et les listes peuvent être découpées avec des tranches :
 Les indices négatifs sont également pris en charge.
 
 ### Fonctions
-
-PyQ permet de créer des fonctions :
 
     fonction saluer(nom):
         afficher("Bonjour")
@@ -447,16 +450,12 @@ Les fonctions peuvent retourner une valeur avec `retourner` et possèdent leur p
 
 ### `nul`
 
-PyQ possède une valeur spéciale `nul` représentant l'absence de valeur :
-
     valeur = nul
 
     afficher(valeur)
     afficher(valeur est nul)
 
 ### Commentaires
-
-Les commentaires commencent par `#` :
 
     # Ceci est un commentaire
     afficher("Bonjour")
@@ -555,6 +554,51 @@ PyQ n'est donc pas un simple traducteur de syntaxe vers Python.
 
 Les erreurs d'exécution sont également converties en erreurs PyQ avec un message et, lorsque cela est possible, le numéro de ligne concerné.
 
+## 📁 Structure du projet
+
+    PyQ/
+    ├── README.md
+    ├── LICENSE
+    ├── pyq.py
+    │
+    ├── exemples/
+    │   ├── bonjour.pyq
+    │   ├── nom.pyq
+    │   ├── calcul.pyq
+    │   ├── comparaisons.pyq
+    │   ├── booleens.pyq
+    │   ├── conditions.pyq
+    │   ├── sinon.pyq
+    │   ├── sinon_si.pyq
+    │   ├── tantque.pyq
+    │   ├── pour.pyq
+    │   ├── interrompre_continuer.pyq
+    │   ├── logique.pyq
+    │   ├── listes.pyq
+    │   ├── methodes_listes.pyq
+    │   ├── dictionnaires.pyq
+    │   ├── fonctions.pyq
+    │   ├── commentaires.pyq
+    │   ├── decimaux.pyq
+    │   ├── nul.pyq
+    │   ├── modulo.pyq
+    │   ├── division_entiere.pyq
+    │   ├── puissance.pyq
+    │   ├── affectations.pyq
+    │   ├── appartenance.pyq
+    │   ├── identite.pyq
+    │   ├── slicing.pyq
+    │   ├── methodes_chaines.pyq
+    │   ├── essayer_sauf_enfin.pyq
+    │   └── stress_test.pyq
+    │
+    └── pyq/
+        ├── __init__.py
+        ├── lexer.py
+        ├── parser.py
+        ├── ast.py
+        └── interpreter.py
+
 ## 🎯 Objectif du projet
 
 PyQ est actuellement en développement.
@@ -617,6 +661,12 @@ Les fonctionnalités précédentes comprennent notamment :
 **PyQ 1.0** sera une étape majeure du développement du langage.
 
 Cette version aura pour objectif de continuer à renforcer les fondations de PyQ et d'introduire progressivement les fonctionnalités nécessaires à la création de programmes de plus en plus importants.
+
+## 🤝 Contribution
+
+Les suggestions, retours et contributions sont les bienvenus.
+
+Si vous trouvez un bug, avez une idée de fonctionnalité ou souhaitez discuter de la conception du langage, vous pouvez ouvrir une issue sur GitHub.
 
 ## 👤 Auteur
 
