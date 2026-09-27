@@ -25,6 +25,7 @@ from pyq.ast import (
     ForStatement,
     BreakStatement,
     ContinueStatement,
+    TryStatement,
 )
 
 
@@ -960,6 +961,25 @@ class Interpreter:
 
             except ContinueSignal:
                 continue
+
+        return None
+
+    def execute_TryStatement(self, node):
+        try:
+            for statement in node.body:
+                self.execute(statement)
+
+        except PyQRuntimeError:
+            if node.except_body is None:
+                raise
+
+            for statement in node.except_body:
+                self.execute(statement)
+
+        finally:
+            if node.finally_body is not None:
+                for statement in node.finally_body:
+                    self.execute(statement)
 
         return None
 
