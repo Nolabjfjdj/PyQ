@@ -981,9 +981,15 @@ class Interpreter:
             for statement in node.body:
                 self.execute(statement)
 
-        except PyQRuntimeError:
+        except PyQRuntimeError as error:
             if node.except_body is None:
                 raise
+
+            if node.except_name is not None:
+                self.environment.define(
+                    node.except_name,
+                    error.message
+                )
 
             for statement in node.except_body:
                 self.execute(statement)
