@@ -156,6 +156,11 @@ class Lexer:
                     and (
                         line[i].isalnum()
                         or line[i] == "_"
+                        or (
+                            line[i] == "'"
+                            and i + 1 < len(line)
+                            and line[i + 1].isalpha()
+                        )
                     )
                 ):
                     i += 1
