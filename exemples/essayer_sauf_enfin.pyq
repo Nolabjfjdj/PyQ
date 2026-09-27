@@ -1,0 +1,7 @@
+essayer:
+    nombre = 10 / 0
+    afficher(nombre)
+sauf:
+    afficher("Une erreur est survenue")
+enfin:
+    afficher("Fin du traitement")
