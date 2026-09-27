@@ -498,6 +498,44 @@ class Parser:
 
             if (
                 self.current().type == "IDENTIFIER"
+                and self.current().value == "est"
+            ):
+                token = self.advance()
+                right = self.parse_addition()
+
+                expression = Comparison(
+                    expression,
+                    "est",
+                    right,
+                    line=token.position
+                )
+                continue
+
+            if (
+                self.current().type == "IDENTIFIER"
+                and self.current().value == "n'est"
+            ):
+                token = self.advance()
+
+                if (
+                    self.current().type != "IDENTIFIER"
+                    or self.current().value != "pas"
+                ):
+                    self.error("attendu pas après n'est")
+
+                self.advance()
+                right = self.parse_addition()
+
+                expression = Comparison(
+                    expression,
+                    "n'est pas",
+                    right,
+                    line=token.position
+                )
+                continue
+
+            if (
+                self.current().type == "IDENTIFIER"
                 and self.current().value == "dans"
             ):
                 token = self.advance()
