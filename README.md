@@ -1,4 +1,4 @@
-# PyQ 🇫🇷
+# PyQ
 
 > **PyQ** est un langage de programmation indépendant, francophone et interprété, créé par **LaBanane415**.
 
