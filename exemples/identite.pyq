@@ -1,0 +1,18 @@
+a = nul
+b = nul
+
+afficher(a est b)
+afficher(a n'est pas b)
+
+x = 10
+y = 10
+
+afficher(x est y)
+afficher(x n'est pas y)
+
+liste1 = [1, 2]
+liste2 = [1, 2]
+
+afficher(liste1 est liste1)
+afficher(liste1 est liste2)
+afficher(liste1 n'est pas liste2)
