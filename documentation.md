@@ -1,4 +1,4 @@
-# Documentation PyQ 🇫🇷
+# Documentation PyQ
 
 Bienvenue dans la documentation officielle de **PyQ**.
 
