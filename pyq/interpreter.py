@@ -16,6 +16,7 @@ from pyq.ast import (
     IndexAssignment,
     FunctionDefinition,
     ReturnStatement,
+    RaiseStatement,
     BinaryOperation,
     Comparison,
     LogicalOperation,
@@ -769,6 +770,17 @@ class Interpreter:
             value = self.execute(node.value)
 
         raise ReturnSignal(value)
+
+    def execute_RaiseStatement(self, node):
+        value = self.execute(node.value)
+
+        if not isinstance(value, str):
+            value = self.format_value(value)
+
+        raise PyQRuntimeError(
+            value,
+            node
+        )
 
     def execute_BinaryOperation(self, node):
         left = self.execute(node.left)
