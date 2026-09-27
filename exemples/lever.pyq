@@ -1,0 +1,8 @@
+essayer:
+    afficher("Avant l'erreur")
+    lever "Erreur déclenchée manuellement"
+    afficher("Cette ligne ne s'affiche pas")
+sauf:
+    afficher("Erreur capturée")
+enfin:
+    afficher("Fin du traitement")
