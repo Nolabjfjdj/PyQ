@@ -835,6 +835,12 @@ class Interpreter:
             if node.operator == "<=":
                 return left <= right
 
+            if node.operator == "est":
+                return left is right
+
+            if node.operator == "n'est pas":
+                return left is not right
+
             if node.operator == "dans":
                 return left in right
 
