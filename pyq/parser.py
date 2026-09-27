@@ -25,6 +25,7 @@ from .ast import (
     ForStatement,
     BreakStatement,
     ContinueStatement,
+    TryStatement,
 )
 
 
@@ -140,6 +141,18 @@ class Parser:
                 line=token.position
             )
 
+        if token.value == "essayer":
+            return self.mark_line(
+                self.parse_try(),
+                token.position
+            )
+
+        if token.value in ("sauf", "enfin"):
+            self.error(
+                f"'{token.value}' inattendu",
+                token
+            )
+
         if token.value == "sinon":
             self.error(
                 "'sinon' inattendu",
@@ -233,6 +246,72 @@ class Parser:
         return ReturnStatement(
             value,
             line=token.position
+        )
+
+    def parse_try(self):
+        self.expect("IDENTIFIER")
+        self.expect("COLON")
+        self.expect("NEWLINE")
+        self.expect("INDENT")
+
+        body = []
+        self.skip_newlines()
+
+        while self.current().type not in ("DEDENT", "EOF"):
+            body.append(self.parse_statement())
+            self.skip_newlines()
+
+        if self.current().type == "DEDENT":
+            self.advance()
+
+        except_body = None
+        finally_body = None
+
+        if (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "sauf"
+        ):
+            self.advance()
+            self.expect("COLON")
+            self.expect("NEWLINE")
+            self.expect("INDENT")
+
+            except_body = []
+            self.skip_newlines()
+
+            while self.current().type not in ("DEDENT", "EOF"):
+                except_body.append(self.parse_statement())
+                self.skip_newlines()
+
+            if self.current().type == "DEDENT":
+                self.advance()
+
+        if (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "enfin"
+        ):
+            self.advance()
+            self.expect("COLON")
+            self.expect("NEWLINE")
+            self.expect("INDENT")
+
+            finally_body = []
+            self.skip_newlines()
+
+            while self.current().type not in ("DEDENT", "EOF"):
+                finally_body.append(self.parse_statement())
+                self.skip_newlines()
+
+            if self.current().type == "DEDENT":
+                self.advance()
+
+        if except_body is None and finally_body is None:
+            self.error("'essayer' doit être suivi de 'sauf' ou 'enfin'")
+
+        return TryStatement(
+            body,
+            except_body,
+            finally_body
         )
 
     def parse_if(self):
