@@ -16,6 +16,7 @@ from .ast import (
     IndexAssignment,
     FunctionDefinition,
     ReturnStatement,
+    RaiseStatement,
     BinaryOperation,
     Comparison,
     LogicalOperation,
@@ -118,6 +119,12 @@ class Parser:
         if token.value == "retourner":
             return self.mark_line(
                 self.parse_return(),
+                token.position
+            )
+
+        if token.value == "lever":
+            return self.mark_line(
+                self.parse_raise(),
                 token.position
             )
 
@@ -244,6 +251,22 @@ class Parser:
             self.advance()
 
         return ReturnStatement(
+            value,
+            line=token.position
+        )
+
+    def parse_raise(self):
+        token = self.expect("IDENTIFIER")
+
+        if self.current().type in ("NEWLINE", "DEDENT", "EOF"):
+            self.error("'lever' doit être suivi d'une valeur", token)
+
+        value = self.parse_expression()
+
+        if self.current().type == "NEWLINE":
+            self.advance()
+
+        return RaiseStatement(
             value,
             line=token.position
         )
