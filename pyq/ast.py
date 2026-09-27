@@ -121,6 +121,12 @@ class ReturnStatement(Node):
 
 
 @dataclass
+class RaiseStatement(Node):
+    value: Node
+    line: int | None = None
+
+
+@dataclass
 class BinaryOperation(Node):
     left: Node
     operator: str
