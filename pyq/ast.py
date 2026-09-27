@@ -182,3 +182,11 @@ class BreakStatement(Node):
 @dataclass
 class ContinueStatement(Node):
     line: int | None = None
+
+@dataclass
+class TryStatement(Node):
+    body: list
+    except_body: list | None = None
+    finally_body: list | None = None
+    line: int | None = None
+
