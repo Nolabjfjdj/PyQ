@@ -288,6 +288,7 @@ class Parser:
             self.advance()
 
         except_body = None
+        except_name = None
         finally_body = None
 
         if (
@@ -295,6 +296,11 @@ class Parser:
             and self.current().value == "sauf"
         ):
             self.advance()
+
+            if self.current().type == "IDENTIFIER":
+                except_name = self.current().value
+                self.advance()
+
             self.expect("COLON")
             self.expect("NEWLINE")
             self.expect("INDENT")
@@ -334,6 +340,7 @@ class Parser:
         return TryStatement(
             body,
             except_body,
+            except_name,
             finally_body
         )
 
