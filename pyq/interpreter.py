@@ -704,20 +704,45 @@ class Interpreter:
     def execute_CompoundAssignment(self, node):
         current = self.environment.get(node.name)
         value = self.execute(node.value)
+
         try:
-            if node.operator == "+": result = current + value
-            elif node.operator == "-": result = current - value
-            elif node.operator == "*": result = current * value
-            elif node.operator == "/": result = current / value
-            elif node.operator == "//": result = current // value
-            elif node.operator == "%": result = current % value
-            elif node.operator == "**": result = current ** value
-            else: raise PyQRuntimeError(f"Opérateur d'affectation inconnu : {node.operator}", node)
+            if node.operator == "+":
+                result = current + value
+            elif node.operator == "-":
+                result = current - value
+            elif node.operator == "*":
+                result = current * value
+            elif node.operator == "/":
+                result = current / value
+            elif node.operator == "//":
+                result = current // value
+            elif node.operator == "%":
+                result = current % value
+            elif node.operator == "**":
+                result = current ** value
+            else:
+                raise PyQRuntimeError(
+                    f"Opérateur d'affectation inconnu : {node.operator}",
+                    node
+                )
+
         except ZeroDivisionError:
-            raise PyQRuntimeError("Division par zéro", node)
+            raise PyQRuntimeError(
+                "Division par zéro",
+                node
+            )
+
         except TypeError:
-            raise PyQRuntimeError("Opération impossible entre ces valeurs", node)
-        self.environment.set(node.name, result)
+            raise PyQRuntimeError(
+                "Opération impossible entre ces valeurs",
+                node
+            )
+
+        self.environment.set(
+            node.name,
+            result
+        )
+
         return result
 
     def execute_IndexAssignment(self, node):
@@ -902,7 +927,11 @@ class Interpreter:
 
         if node.operator in ("-", "+"):
             try:
-                return -operand if node.operator == "-" else +operand
+                return (
+                    -operand
+                    if node.operator == "-"
+                    else +operand
+                )
 
             except TypeError:
                 raise PyQRuntimeError(
@@ -986,7 +1015,7 @@ class Interpreter:
                 raise
 
             if node.except_name is not None:
-                self.environment.define(
+                self.environment.set(
                     node.except_name,
                     error.message
                 )
