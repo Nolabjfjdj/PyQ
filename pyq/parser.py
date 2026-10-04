@@ -220,11 +220,23 @@ class Parser:
         self.expect("LPAREN")
 
         parameters = []
+        default_found = False
 
         if self.current().type != "RPAREN":
             while True:
                 parameter = self.expect("IDENTIFIER").value
-                parameters.append(parameter)
+                default_value = None
+
+                if self.current().type == "EQUALS":
+                    self.advance()
+                    default_value = self.parse_expression()
+                    default_found = True
+                elif default_found:
+                    raise SyntaxError(
+                        f"Paramètre sans valeur par défaut après un paramètre avec valeur par défaut à la ligne {self.current().position}"
+                    )
+
+                parameters.append((parameter, default_value))
 
                 if self.current().type != "COMMA":
                     break
