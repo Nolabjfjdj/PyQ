@@ -1,0 +1,3 @@
+écrire_fichier("donnees.txt", "Bonjour depuis PyQ !")
+contenu = lire_fichier("donnees.txt")
+afficher(contenu)
