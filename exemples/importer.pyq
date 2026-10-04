@@ -1,0 +1,4 @@
+importer "module_outils.pyq"
+
+saluer("Nolan")
+afficher(message)
