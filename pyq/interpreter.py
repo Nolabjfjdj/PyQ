@@ -640,6 +640,24 @@ class Interpreter:
             self.print_value(arguments[0])
             return None
 
+        if node.name == "demander":
+            if len(arguments) != 1:
+                raise PyQRuntimeError(
+                    "demander() attend exactement un argument",
+                    node
+                )
+
+            if not isinstance(arguments[0], str):
+                raise PyQRuntimeError(
+                    "demander() attend une chaîne de caractères",
+                    node
+                )
+
+            try:
+                return input(arguments[0])
+            except EOFError:
+                return ""
+
         try:
             function = self.environment.get(node.name)
 
