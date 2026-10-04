@@ -721,6 +721,61 @@ class Interpreter:
             except EOFError:
                 return ""
 
+        if node.name == "lire_fichier":
+            if len(arguments) != 1:
+                raise PyQRuntimeError(
+                    "lire_fichier() attend exactement un argument",
+                    node
+                )
+
+            if not isinstance(arguments[0], str):
+                raise PyQRuntimeError(
+                    "lire_fichier() attend un chemin sous forme de chaîne de caractères",
+                    node
+                )
+
+            path = self.base_dir / arguments[0]
+
+            try:
+                return path.read_text(encoding="utf-8")
+            except OSError as error:
+                raise PyQRuntimeError(
+                    f"Impossible de lire le fichier : {arguments[0]}",
+                    node
+                ) from error
+
+        if node.name == "écrire_fichier":
+            if len(arguments) != 2:
+                raise PyQRuntimeError(
+                    "écrire_fichier() attend exactement deux arguments",
+                    node
+                )
+
+            if not isinstance(arguments[0], str):
+                raise PyQRuntimeError(
+                    "écrire_fichier() attend un chemin sous forme de chaîne de caractères",
+                    node
+                )
+
+            if not isinstance(arguments[1], str):
+                raise PyQRuntimeError(
+                    "écrire_fichier() attend un contenu sous forme de chaîne de caractères",
+                    node
+                )
+
+            path = self.base_dir / arguments[0]
+
+            try:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text(arguments[1], encoding="utf-8")
+            except OSError as error:
+                raise PyQRuntimeError(
+                    f"Impossible d'écrire le fichier : {arguments[0]}",
+                    node
+                ) from error
+
+            return None
+
         try:
             function = self.environment.get(node.name)
 
