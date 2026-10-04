@@ -1,3 +1,8 @@
+from pathlib import Path
+
+from pyq.lexer import Lexer
+from pyq.parser import Parser
+
 from pyq.ast import (
     Program,
     StringLiteral,
@@ -11,6 +16,7 @@ from pyq.ast import (
     SliceAccess,
     MethodCall,
     FunctionCall,
+    ImportStatement,
     VariableAssignment,
     CompoundAssignment,
     IndexAssignment,
@@ -91,8 +97,10 @@ class Environment:
 
 
 class Interpreter:
-    def __init__(self):
+    def __init__(self, base_dir=None):
         self.environment = Environment()
+        self.base_dir = Path(base_dir) if base_dir is not None else Path.cwd()
+        self.imported_files = set()
 
     def execute(self, node):
         method = getattr(
@@ -623,6 +631,61 @@ class Interpreter:
             f"Méthode inconnue : {node.name}",
             node
         )
+
+    def execute_ImportStatement(self, node):
+        path_value = self.execute(node.path)
+
+        if not isinstance(path_value, str):
+            raise PyQRuntimeError(
+                "importer() attend le chemin du module sous forme de chaîne de caractères",
+                node
+            )
+
+        module_path = Path(path_value)
+
+        if not module_path.is_absolute():
+            module_path = self.base_dir / module_path
+
+        if module_path.suffix == "":
+            module_path = module_path.with_suffix(".pyq")
+
+        module_path = module_path.resolve()
+
+        if not module_path.exists():
+            raise PyQRuntimeError(
+                f"Module introuvable : {path_value}",
+                node
+            )
+
+        if module_path in self.imported_files:
+            return None
+
+        try:
+            source = module_path.read_text(encoding="utf-8")
+        except OSError as error:
+            raise PyQRuntimeError(
+                f"Impossible de lire le module : {error}",
+                node
+            )
+
+        self.imported_files.add(module_path)
+
+        lexer = Lexer(source)
+        tokens = lexer.tokenize()
+        parser = Parser(tokens)
+        program = parser.parse()
+
+        previous_base_dir = self.base_dir
+        self.base_dir = module_path.parent
+
+        try:
+            self.execute(program)
+        except PyQRuntimeError:
+            raise
+        finally:
+            self.base_dir = previous_base_dir
+
+        return None
 
     def execute_FunctionCall(self, node):
         arguments = [
