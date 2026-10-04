@@ -1,0 +1,12 @@
+fonction saluer(nom = "Monde"):
+    afficher("Bonjour")
+    afficher(nom)
+
+saluer()
+saluer("Nolan")
+
+fonction additionner(a, b = 10):
+    retourner a + b
+
+afficher(additionner(5))
+afficher(additionner(5, 20))
