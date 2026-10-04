@@ -11,6 +11,7 @@ from .ast import (
     SliceAccess,
     MethodCall,
     FunctionCall,
+    ImportStatement,
     VariableAssignment,
     CompoundAssignment,
     IndexAssignment,
@@ -110,6 +111,12 @@ class Parser:
                 token.position
             )
 
+        if token.value == "importer":
+            return self.mark_line(
+                self.parse_import(),
+                token.position
+            )
+
         if token.value == "fonction":
             return self.mark_line(
                 self.parse_function_definition(),
@@ -194,6 +201,16 @@ class Parser:
             statement,
             token.position
         )
+
+    def parse_import(self):
+        self.expect("IDENTIFIER")
+
+        path = self.parse_expression()
+
+        if self.current().type == "NEWLINE":
+            self.advance()
+
+        return ImportStatement(path)
 
     def parse_function_definition(self):
         self.expect("IDENTIFIER")
