@@ -77,6 +77,12 @@ class SliceAccess(Node):
 
 
 @dataclass
+class ImportStatement(Node):
+    path: Node
+    line: int | None = None
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     arguments: list
@@ -189,11 +195,10 @@ class BreakStatement(Node):
 class ContinueStatement(Node):
     line: int | None = None
 
-
 @dataclass
 class TryStatement(Node):
     body: list
     except_body: list | None = None
-    except_name: str | None = None
     finally_body: list | None = None
     line: int | None = None
+
