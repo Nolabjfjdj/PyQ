@@ -189,10 +189,11 @@ class BreakStatement(Node):
 class ContinueStatement(Node):
     line: int | None = None
 
+
 @dataclass
 class TryStatement(Node):
     body: list
     except_body: list | None = None
+    except_name: str | None = None
     finally_body: list | None = None
     line: int | None = None
-
