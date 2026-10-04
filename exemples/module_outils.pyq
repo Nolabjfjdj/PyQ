@@ -1,0 +1,5 @@
+fonction saluer(nom):
+    afficher("Bonjour")
+    afficher(nom)
+
+message = "Module PyQ"
