@@ -57,11 +57,12 @@ class ContinueSignal(Exception):
 
 
 class Function:
-    def __init__(self, name, parameters, body, closure):
+    def __init__(self, name, parameters, body, closure, defaults):
         self.name = name
         self.parameters = parameters
         self.body = body
         self.closure = closure
+        self.defaults = defaults
 
 
 class Environment:
@@ -791,10 +792,12 @@ class Interpreter:
                 node
             )
 
-        if len(arguments) != len(function.parameters):
+        required_count = len(function.parameters) - len(function.defaults)
+
+        if len(arguments) < required_count or len(arguments) > len(function.parameters):
             raise PyQRuntimeError(
-                f"La fonction {function.name} attend "
-                f"{len(function.parameters)} argument(s), "
+                f"La fonction {function.name} attend entre "
+                f"{required_count} et {len(function.parameters)} argument(s), "
                 f"mais {len(arguments)} ont été fournis",
                 node
             )
@@ -803,13 +806,15 @@ class Interpreter:
             function.closure
         )
 
-        for parameter, argument in zip(
-            function.parameters,
-            arguments
-        ):
+        for index, parameter in enumerate(function.parameters):
+            if index < len(arguments):
+                value = arguments[index]
+            else:
+                value = function.defaults[index - required_count]
+
             function_environment.define(
                 parameter,
-                argument
+                value
             )
 
         previous_environment = self.environment
@@ -910,11 +915,21 @@ class Interpreter:
         return value
 
     def execute_FunctionDefinition(self, node):
+        parameters = []
+        defaults = []
+
+        for parameter, default_node in node.parameters:
+            parameters.append(parameter)
+
+            if default_node is not None:
+                defaults.append(self.execute(default_node))
+
         function = Function(
             node.name,
-            node.parameters,
+            parameters,
             node.body,
-            self.environment
+            self.environment,
+            defaults
         )
 
         self.environment.define(
