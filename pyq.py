@@ -1,4 +1,5 @@
 import sys
+from pathlib import Path
 
 from pyq.lexer import Lexer
 from pyq.parser import Parser
@@ -15,7 +16,7 @@ def run_file(filename):
     parser = Parser(tokens)
     program = parser.parse()
 
-    interpreter = Interpreter()
+    interpreter = Interpreter(base_dir=Path(filename).resolve().parent)
     interpreter.execute(program)
 
 
