@@ -1,0 +1,16 @@
+nombres = [1, 2, 3, 4, 5]
+
+doubles = [nombre * 2 pour nombre dans nombres]
+afficher(doubles)
+
+pairs = [nombre pour nombre dans nombres si nombre % 2 == 0]
+afficher(pairs)
+
+carres = [nombre ** 2 pour nombre dans nombres si nombre > 2]
+afficher(carres)
+
+lettres = [lettre pour lettre dans "PyQ"]
+afficher(lettres)
+
+liste_vide = [nombre pour nombre dans []]
+afficher(liste_vide)
