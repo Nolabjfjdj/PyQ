@@ -59,6 +59,15 @@ class DictLiteral(Node):
     entries: list
     line: int | None = None
 
+@dataclass
+class DictComprehension(Node):
+    key: Node
+    value: Node
+    variable: str
+    iterable: Node
+    condition: Node | None = None
+    line: int | None = None
+
 
 @dataclass
 class IndexAccess(Node):
