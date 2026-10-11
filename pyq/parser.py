@@ -6,6 +6,7 @@ from .ast import (
     NullLiteral,
     Identifier,
     ListLiteral,
+    ListComprehension,
     DictLiteral,
     IndexAccess,
     SliceAccess,
@@ -1052,17 +1053,63 @@ class Parser:
 
         self.skip_newlines()
 
-        if self.current().type != "RBRACKET":
-            while True:
-                elements.append(self.parse_expression())
+        if self.current().type == "RBRACKET":
+            self.advance()
+            return ListLiteral(
+                elements,
+                line=token.position
+            )
 
-                self.skip_newlines()
+        element = self.parse_expression()
+        self.skip_newlines()
 
-                if self.current().type != "COMMA":
-                    break
+        if (
+            self.current().type == "IDENTIFIER"
+            and self.current().value == "pour"
+        ):
+            self.advance()
+            variable = self.expect("IDENTIFIER").value
 
+            if (
+                self.current().type != "IDENTIFIER"
+                or self.current().value != "dans"
+            ):
+                self.error(
+                    f"attendu 'dans', obtenu {self.current().value}"
+                )
+
+            self.advance()
+            iterable = self.parse_expression()
+            condition = None
+
+            if (
+                self.current().type == "IDENTIFIER"
+                and self.current().value == "si"
+            ):
                 self.advance()
-                self.skip_newlines()
+                condition = self.parse_expression()
+
+            self.expect("RBRACKET")
+
+            return ListComprehension(
+                element,
+                variable,
+                iterable,
+                condition,
+                line=token.position
+            )
+
+        elements.append(element)
+
+        while self.current().type == "COMMA":
+            self.advance()
+            self.skip_newlines()
+
+            if self.current().type == "RBRACKET":
+                break
+
+            elements.append(self.parse_expression())
+            self.skip_newlines()
 
         self.expect("RBRACKET")
 
