@@ -871,7 +871,21 @@ class Parser:
 
                 if self.current().type != "RPAREN":
                     while True:
-                        arguments.append(self.parse_expression())
+                        if (
+                            self.current().type == "IDENTIFIER"
+                            and self.tokens[self.position + 1].type == "EQUALS"
+                        ):
+                            name_token = self.advance()
+                            self.advance()
+                            arguments.append(
+                                NamedArgument(
+                                    name_token.value,
+                                    self.parse_expression(),
+                                    line=name_token.position
+                                )
+                            )
+                        else:
+                            arguments.append(self.parse_expression())
 
                         if self.current().type != "COMMA":
                             break
