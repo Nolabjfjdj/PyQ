@@ -8,6 +8,7 @@ from .ast import (
     ListLiteral,
     ListComprehension,
     DictLiteral,
+    DictComprehension,
     IndexAccess,
     SliceAccess,
     MethodCall,
@@ -1126,25 +1127,65 @@ class Parser:
         self.skip_newlines()
 
         if self.current().type != "RBRACE":
-            while True:
-                key = self.parse_expression()
+            key = self.parse_expression()
+            self.skip_newlines()
+            self.expect("COLON")
+            self.skip_newlines()
+            value = self.parse_expression()
+            self.skip_newlines()
 
-                self.skip_newlines()
+            if (
+                self.current().type == "IDENTIFIER"
+                and self.current().value == "pour"
+            ):
+                self.advance()
+                variable = self.expect("IDENTIFIER").value
 
-                self.expect("COLON")
-
-                self.skip_newlines()
-
-                value = self.parse_expression()
-
-                entries.append((key, value))
-
-                self.skip_newlines()
-
-                if self.current().type != "COMMA":
-                    break
+                if (
+                    self.current().type != "IDENTIFIER"
+                    or self.current().value != "dans"
+                ):
+                    self.error(
+                        f"attendu 'dans', obtenu {self.current().value}"
+                    )
 
                 self.advance()
+                iterable = self.parse_expression()
+                condition = None
+
+                if (
+                    self.current().type == "IDENTIFIER"
+                    and self.current().value == "si"
+                ):
+                    self.advance()
+                    condition = self.parse_expression()
+
+                self.expect("RBRACE")
+
+                return DictComprehension(
+                    key,
+                    value,
+                    variable,
+                    iterable,
+                    condition,
+                    line=token.position
+                )
+
+            entries.append((key, value))
+
+            while self.current().type == "COMMA":
+                self.advance()
+                self.skip_newlines()
+
+                if self.current().type == "RBRACE":
+                    break
+
+                key = self.parse_expression()
+                self.skip_newlines()
+                self.expect("COLON")
+                self.skip_newlines()
+                value = self.parse_expression()
+                entries.append((key, value))
                 self.skip_newlines()
 
         self.expect("RBRACE")
