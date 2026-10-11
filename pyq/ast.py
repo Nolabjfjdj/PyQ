@@ -83,6 +83,13 @@ class ImportStatement(Node):
 
 
 @dataclass
+class NamedArgument(Node):
+    name: str
+    value: Node
+    line: int | None = None
+
+
+@dataclass
 class FunctionCall(Node):
     name: str
     arguments: list

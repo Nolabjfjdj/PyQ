@@ -1,0 +1,4 @@
+fonction additionner(a, b=10):
+    retourner a + b
+
+afficher(additionner(b=20))

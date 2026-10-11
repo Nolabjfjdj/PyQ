@@ -16,6 +16,7 @@ from pyq.ast import (
     SliceAccess,
     MethodCall,
     FunctionCall,
+    NamedArgument,
     ImportStatement,
     VariableAssignment,
     CompoundAssignment,
@@ -280,7 +281,7 @@ class Interpreter:
                 return len(target)
 
             if node.name == "ajouter":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "ajouter() attend exactement un argument",
                         node
@@ -290,7 +291,7 @@ class Interpreter:
                 return None
 
             if node.name == "retirer":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "retirer() attend exactement un argument",
                         node
@@ -318,7 +319,7 @@ class Interpreter:
                 return len(target)
 
             if node.name == "contient":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "contient() attend exactement un argument",
                         node
@@ -327,7 +328,7 @@ class Interpreter:
                 return arguments[0] in target
 
             if node.name == "commence_par":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "commence_par() attend exactement un argument",
                         node
@@ -336,7 +337,7 @@ class Interpreter:
                 return target.startswith(arguments[0])
 
             if node.name == "finit_par":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "finit_par() attend exactement un argument",
                         node
@@ -381,7 +382,7 @@ class Interpreter:
                 return target[::-1]
 
             if node.name == "repetitions":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "repetitions() attend exactement un argument",
                         node
@@ -402,7 +403,7 @@ class Interpreter:
                 return target * arguments[0]
 
             if node.name == "remplacer":
-                if len(arguments) != 2:
+                if len(arguments) != 2 or named_arguments:
                     raise PyQRuntimeError(
                         "remplacer() attend exactement deux arguments",
                         node
@@ -414,7 +415,7 @@ class Interpreter:
                 )
 
             if node.name == "separer":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "separer() attend exactement un argument",
                         node
@@ -423,7 +424,7 @@ class Interpreter:
                 return target.split(arguments[0])
 
             if node.name == "joindre":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "joindre() attend exactement un argument",
                         node
@@ -459,7 +460,7 @@ class Interpreter:
                 return target.strip(arguments[0])
 
             if node.name == "chercher":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "chercher() attend exactement un argument",
                         node
@@ -468,7 +469,7 @@ class Interpreter:
                 return target.find(arguments[0])
 
             if node.name == "position":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "position() attend exactement un argument",
                         node
@@ -485,7 +486,7 @@ class Interpreter:
                 return position
 
             if node.name == "compter":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "compter() attend exactement un argument",
                         node
@@ -574,7 +575,7 @@ class Interpreter:
                 return target == ""
 
             if node.name == "debut":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "debut() attend exactement un argument",
                         node
@@ -589,7 +590,7 @@ class Interpreter:
                 return target[:arguments[0]]
 
             if node.name == "fin":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "fin() attend exactement un argument",
                         node
@@ -608,7 +609,7 @@ class Interpreter:
                 )
 
             if node.name == "retirer_debut":
-                if len(arguments) != 1:
+                if len(arguments) != 1 or named_arguments:
                     raise PyQRuntimeError(
                         "retirer_debut() attend exactement un argument",
                         node
@@ -689,13 +690,34 @@ class Interpreter:
         return None
 
     def execute_FunctionCall(self, node):
-        arguments = [
-            self.execute(argument)
-            for argument in node.arguments
-        ]
+        positional_arguments = []
+        named_arguments = {}
+        named_started = False
+
+        for argument in node.arguments:
+            if isinstance(argument, NamedArgument):
+                named_started = True
+
+                if argument.name in named_arguments:
+                    raise PyQRuntimeError(
+                        f"Argument nommé fourni plusieurs fois : {argument.name}",
+                        node
+                    )
+
+                named_arguments[argument.name] = self.execute(argument.value)
+            else:
+                if named_started:
+                    raise PyQRuntimeError(
+                        "Un argument positionnel ne peut pas suivre un argument nommé",
+                        node
+                    )
+
+                positional_arguments.append(self.execute(argument))
+
+        arguments = positional_arguments
 
         if node.name == "afficher":
-            if len(arguments) != 1:
+            if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
                     "afficher() attend exactement un argument",
                     node
@@ -705,7 +727,7 @@ class Interpreter:
             return None
 
         if node.name == "demander":
-            if len(arguments) != 1:
+            if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
                     "demander() attend exactement un argument",
                     node
@@ -723,7 +745,7 @@ class Interpreter:
                 return ""
 
         if node.name == "lire_fichier":
-            if len(arguments) != 1:
+            if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
                     "lire_fichier() attend exactement un argument",
                     node
@@ -746,7 +768,7 @@ class Interpreter:
                 ) from error
 
         if node.name == "écrire_fichier":
-            if len(arguments) != 2:
+            if len(arguments) != 2 or named_arguments:
                 raise PyQRuntimeError(
                     "écrire_fichier() attend exactement deux arguments",
                     node
@@ -792,13 +814,47 @@ class Interpreter:
                 node
             )
 
+        if len(positional_arguments) > len(function.parameters):
+            raise PyQRuntimeError(
+                f"La fonction {function.name} attend au maximum {len(function.parameters)} argument(s), "
+                f"mais {len(positional_arguments)} ont été fournis",
+                node
+            )
+
+        parameter_values = {}
+
+        for index, value in enumerate(positional_arguments):
+            parameter_values[function.parameters[index]] = value
+
+        parameter_names = set(function.parameters)
+
+        for name, value in named_arguments.items():
+            if name not in parameter_names:
+                raise PyQRuntimeError(
+                    f"La fonction {function.name} n'a pas de paramètre nommé : {name}",
+                    node
+                )
+
+            if name in parameter_values:
+                raise PyQRuntimeError(
+                    f"L'argument {name} a été fourni plusieurs fois",
+                    node
+                )
+
+            parameter_values[name] = value
+
         required_count = len(function.parameters) - len(function.defaults)
 
-        if len(arguments) < required_count or len(arguments) > len(function.parameters):
+        missing_required = [
+            parameter
+            for parameter in function.parameters[:required_count]
+            if parameter not in parameter_values
+        ]
+
+        if missing_required:
             raise PyQRuntimeError(
-                f"La fonction {function.name} attend entre "
-                f"{required_count} et {len(function.parameters)} argument(s), "
-                f"mais {len(arguments)} ont été fournis",
+                f"La fonction {function.name} a des paramètres obligatoires manquants : "
+                f"{', '.join(missing_required)}",
                 node
             )
 
@@ -806,11 +862,13 @@ class Interpreter:
             function.closure
         )
 
+        default_start = required_count
+
         for index, parameter in enumerate(function.parameters):
-            if index < len(arguments):
-                value = arguments[index]
+            if parameter in parameter_values:
+                value = parameter_values[parameter]
             else:
-                value = function.defaults[index - required_count]
+                value = function.defaults[index - default_start]
 
             function_environment.define(
                 parameter,

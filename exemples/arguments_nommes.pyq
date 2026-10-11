@@ -1,0 +1,11 @@
+fonction afficher_profil(nom, age):
+    afficher(nom)
+    afficher(age)
+
+afficher_profil(age=14, nom="Nolan")
+
+fonction additionner(a, b=10):
+    retourner a + b
+
+afficher(additionner(b=20, a=5))
+afficher(additionner(a=5))
