@@ -45,6 +45,14 @@ class ListLiteral(Node):
     elements: list
     line: int | None = None
 
+@dataclass
+class ListComprehension(Node):
+    element: Node
+    variable: str
+    iterable: Node
+    condition: Node | None = None
+    line: int | None = None
+
 
 @dataclass
 class DictLiteral(Node):
