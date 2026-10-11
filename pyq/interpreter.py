@@ -11,6 +11,7 @@ from pyq.ast import (
     NullLiteral,
     Identifier,
     ListLiteral,
+    ListComprehension,
     DictLiteral,
     IndexAccess,
     SliceAccess,
@@ -155,6 +156,38 @@ class Interpreter:
             self.execute(element)
             for element in node.elements
         ]
+
+    def execute_ListComprehension(self, node):
+        iterable = self.execute(node.iterable)
+
+        try:
+            values = iter(iterable)
+        except TypeError:
+            raise PyQRuntimeError(
+                "La valeur utilisée dans une compréhension de liste n'est pas parcourable",
+                node
+            )
+
+        result = []
+        previous_environment = self.environment
+        comprehension_environment = Environment(previous_environment)
+        self.environment = comprehension_environment
+
+        try:
+            for value in values:
+                comprehension_environment.define(node.variable, value)
+
+                if (
+                    node.condition is not None
+                    and not self.is_truthy(self.execute(node.condition))
+                ):
+                    continue
+
+                result.append(self.execute(node.element))
+        finally:
+            self.environment = previous_environment
+
+        return result
 
     def execute_DictLiteral(self, node):
         result = {}
