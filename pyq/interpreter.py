@@ -281,7 +281,7 @@ class Interpreter:
                 return len(target)
 
             if node.name == "ajouter":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "ajouter() attend exactement un argument",
                         node
@@ -291,7 +291,7 @@ class Interpreter:
                 return None
 
             if node.name == "retirer":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "retirer() attend exactement un argument",
                         node
@@ -319,7 +319,7 @@ class Interpreter:
                 return len(target)
 
             if node.name == "contient":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "contient() attend exactement un argument",
                         node
@@ -328,7 +328,7 @@ class Interpreter:
                 return arguments[0] in target
 
             if node.name == "commence_par":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "commence_par() attend exactement un argument",
                         node
@@ -337,7 +337,7 @@ class Interpreter:
                 return target.startswith(arguments[0])
 
             if node.name == "finit_par":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "finit_par() attend exactement un argument",
                         node
@@ -382,7 +382,7 @@ class Interpreter:
                 return target[::-1]
 
             if node.name == "repetitions":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "repetitions() attend exactement un argument",
                         node
@@ -403,7 +403,7 @@ class Interpreter:
                 return target * arguments[0]
 
             if node.name == "remplacer":
-                if len(arguments) != 2 or named_arguments:
+                if len(arguments) != 2:
                     raise PyQRuntimeError(
                         "remplacer() attend exactement deux arguments",
                         node
@@ -415,7 +415,7 @@ class Interpreter:
                 )
 
             if node.name == "separer":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "separer() attend exactement un argument",
                         node
@@ -424,7 +424,7 @@ class Interpreter:
                 return target.split(arguments[0])
 
             if node.name == "joindre":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "joindre() attend exactement un argument",
                         node
@@ -460,7 +460,7 @@ class Interpreter:
                 return target.strip(arguments[0])
 
             if node.name == "chercher":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "chercher() attend exactement un argument",
                         node
@@ -469,7 +469,7 @@ class Interpreter:
                 return target.find(arguments[0])
 
             if node.name == "position":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "position() attend exactement un argument",
                         node
@@ -486,7 +486,7 @@ class Interpreter:
                 return position
 
             if node.name == "compter":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "compter() attend exactement un argument",
                         node
@@ -575,7 +575,7 @@ class Interpreter:
                 return target == ""
 
             if node.name == "debut":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "debut() attend exactement un argument",
                         node
@@ -590,7 +590,7 @@ class Interpreter:
                 return target[:arguments[0]]
 
             if node.name == "fin":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "fin() attend exactement un argument",
                         node
@@ -609,7 +609,7 @@ class Interpreter:
                 )
 
             if node.name == "retirer_debut":
-                if len(arguments) != 1 or named_arguments:
+                if len(arguments) != 1:
                     raise PyQRuntimeError(
                         "retirer_debut() attend exactement un argument",
                         node
