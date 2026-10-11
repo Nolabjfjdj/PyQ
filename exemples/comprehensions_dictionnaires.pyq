@@ -1,0 +1,13 @@
+nombres = [1, 2, 3, 4, 5]
+
+carres = {nombre: nombre ** 2 pour nombre dans nombres}
+afficher(carres)
+
+pairs = {nombre: nombre ** 2 pour nombre dans nombres si nombre % 2 == 0}
+afficher(pairs)
+
+lettres = {lettre: lettre.majuscule() pour lettre dans "pyq"}
+afficher(lettres)
+
+dictionnaire_vide = {nombre: nombre pour nombre dans []}
+afficher(dictionnaire_vide)
