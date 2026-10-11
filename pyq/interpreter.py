@@ -13,6 +13,7 @@ from pyq.ast import (
     ListLiteral,
     ListComprehension,
     DictLiteral,
+    DictComprehension,
     IndexAccess,
     SliceAccess,
     MethodCall,
@@ -196,6 +197,47 @@ class Interpreter:
             key = self.execute(key_node)
             value = self.execute(value_node)
             result[key] = value
+
+        return result
+
+    def execute_DictComprehension(self, node):
+        iterable = self.execute(node.iterable)
+
+        try:
+            values = iter(iterable)
+        except TypeError:
+            raise PyQRuntimeError(
+                "La valeur utilisée dans une compréhension de dictionnaire n'est pas parcourable",
+                node
+            )
+
+        result = {}
+        previous_environment = self.environment
+        comprehension_environment = Environment(previous_environment)
+        self.environment = comprehension_environment
+
+        try:
+            for item in values:
+                comprehension_environment.define(node.variable, item)
+
+                if (
+                    node.condition is not None
+                    and not self.is_truthy(self.execute(node.condition))
+                ):
+                    continue
+
+                key = self.execute(node.key)
+                value = self.execute(node.value)
+
+                try:
+                    result[key] = value
+                except TypeError:
+                    raise PyQRuntimeError(
+                        "La clé créée dans la compréhension de dictionnaire n'est pas valide",
+                        node
+                    )
+        finally:
+            self.environment = previous_environment
 
         return result
 
