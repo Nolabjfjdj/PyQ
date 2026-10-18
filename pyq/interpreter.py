@@ -365,42 +365,7 @@ class Interpreter:
         ]
 
         if isinstance(target, list):
-            if node.name == "somme":
-            if named_arguments or len(arguments) not in (1, 2):
-                raise PyQRuntimeError(
-                    "somme() attend un itérable et éventuellement une valeur de départ",
-                    node
-                )
-
-            iterable = arguments[0]
-            start = arguments[1] if len(arguments) == 2 else 0
-
-            if not isinstance(iterable, (list, tuple, range)):
-                raise PyQRuntimeError(
-                    "somme() attend une liste, un tuple ou un intervalle",
-                    node
-                )
-
-            if not isinstance(start, (int, float)) or isinstance(start, bool):
-                raise PyQRuntimeError(
-                    "La valeur de départ de somme() doit être un nombre",
-                    node
-                )
-
-            total = start
-
-            for value in iterable:
-                if not isinstance(value, (int, float)) or isinstance(value, bool):
-                    raise PyQRuntimeError(
-                        "somme() ne peut additionner que des nombres",
-                        node
-                    )
-
-                total += value
-
-            return total
-
-        if node.name == "taille":
+            if node.name == "taille":
                 if len(arguments) != 0:
                     raise PyQRuntimeError(
                         "taille() n'attend aucun argument",
@@ -844,6 +809,41 @@ class Interpreter:
                 positional_arguments.append(self.execute(argument))
 
         arguments = positional_arguments
+
+        if node.name == "somme":
+            if named_arguments or len(arguments) not in (1, 2):
+                raise PyQRuntimeError(
+                    "somme() attend un itérable et éventuellement une valeur de départ",
+                    node
+                )
+
+            iterable = arguments[0]
+            start = arguments[1] if len(arguments) == 2 else 0
+
+            if not isinstance(iterable, (list, tuple, range)):
+                raise PyQRuntimeError(
+                    "somme() attend une liste, un tuple ou un intervalle",
+                    node
+                )
+
+            if not isinstance(start, (int, float)) or isinstance(start, bool):
+                raise PyQRuntimeError(
+                    "La valeur de départ de somme() doit être un nombre",
+                    node
+                )
+
+            total = start
+
+            for value in iterable:
+                if not isinstance(value, (int, float)) or isinstance(value, bool):
+                    raise PyQRuntimeError(
+                        "somme() ne peut additionner que des nombres",
+                        node
+                    )
+
+                total += value
+
+            return total
 
         if node.name == "taille":
             if len(arguments) != 1 or named_arguments:
