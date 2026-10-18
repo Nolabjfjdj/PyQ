@@ -280,6 +280,18 @@ class Interpreter:
                     node
                 )
 
+            if isinstance(target, tuple):
+                if isinstance(index, int):
+                    raise PyQRuntimeError(
+                        f"Index de tuple hors limites : {index}",
+                        node
+                    )
+
+                raise PyQRuntimeError(
+                    "Index de tuple invalide",
+                    node
+                )
+
             if isinstance(target, dict):
                 raise PyQRuntimeError(
                     f"Clé inexistante : {index}",
@@ -329,9 +341,9 @@ class Interpreter:
                 node
             )
 
-        if not isinstance(target, (str, list)):
+        if not isinstance(target, (str, list, tuple)):
             raise PyQRuntimeError(
-                "La découpe est disponible uniquement pour les chaînes et les listes",
+                "La découpe est disponible uniquement pour les chaînes, les listes et les tuples",
                 node
             )
 
