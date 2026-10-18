@@ -1,0 +1,5 @@
+afficher(taille("Bonjour"))
+afficher(taille([10, 20, 30]))
+afficher(taille((1, 2, 3, 4)))
+afficher(taille({"nom": "PyQ", "version": 0.9}))
+afficher(taille(intervalle(5)))
