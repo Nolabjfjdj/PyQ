@@ -1,0 +1,17 @@
+nombres = (1, 2, 3, 4)
+afficher(nombres)
+afficher(nombres[0])
+afficher(nombres[1:3])
+
+tuple_vide = ()
+afficher(tuple_vide)
+
+tuple_unique = (42,)
+afficher(tuple_unique)
+
+coordonnees = (10, 20)
+coordonnees_etendues = coordonnees + (30,)
+afficher(coordonnees_etendues)
+
+imbrique = ("pyq", (1, 2), vrai)
+afficher(imbrique)
