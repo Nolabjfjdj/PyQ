@@ -11,6 +11,7 @@ from pyq.ast import (
     NullLiteral,
     Identifier,
     ListLiteral,
+    TupleLiteral,
     ListComprehension,
     DictLiteral,
     DictComprehension,
@@ -157,6 +158,12 @@ class Interpreter:
             self.execute(element)
             for element in node.elements
         ]
+
+    def execute_TupleLiteral(self, node):
+        return tuple(
+            self.execute(element)
+            for element in node.elements
+        )
 
     def execute_ListComprehension(self, node):
         iterable = self.execute(node.iterable)
@@ -1347,6 +1354,16 @@ class Interpreter:
             )
             return
 
+        if isinstance(value, tuple):
+            contents = ", ".join(
+                self.format_value(item)
+                for item in value
+            )
+            if len(value) == 1:
+                contents += ","
+            print("(" + contents + ")")
+            return
+
         if isinstance(value, dict):
             entries = []
 
@@ -1387,6 +1404,15 @@ class Interpreter:
                 )
                 + "]"
             )
+
+        if isinstance(value, tuple):
+            contents = ", ".join(
+                self.format_value(item)
+                for item in value
+            )
+            if len(value) == 1:
+                contents += ","
+            return "(" + contents + ")"
 
         if isinstance(value, dict):
             entries = []
