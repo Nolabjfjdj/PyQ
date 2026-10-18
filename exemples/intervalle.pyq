@@ -1,0 +1,15 @@
+nombres = []
+pour nombre dans intervalle(5):
+    nombres.ajouter(nombre)
+afficher(nombres)
+
+pairs = [nombre pour nombre dans intervalle(0, 10, 2)]
+afficher(pairs)
+
+decroissant = []
+pour nombre dans intervalle(5, 0, -1):
+    decroissant.ajouter(nombre)
+afficher(decroissant)
+
+vide = intervalle(3, 3)
+afficher([nombre pour nombre dans vide])
