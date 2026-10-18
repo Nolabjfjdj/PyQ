@@ -1,0 +1,7 @@
+mots = ["Bonjour", "tout", "le", "monde"]
+phrase = " ".joindre(mots)
+afficher(phrase)
+
+afficher("-".joindre(["PyQ", "est", "cool"]))
+afficher("".joindre(["P", "y", "Q"]))
+afficher(", ".joindre([]))
