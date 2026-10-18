@@ -810,6 +810,46 @@ class Interpreter:
 
         arguments = positional_arguments
 
+        if node.name == "intervalle":
+            if named_arguments:
+                raise PyQRuntimeError(
+                    "intervalle() n'accepte pas d'arguments nommés",
+                    node
+                )
+
+            if len(arguments) not in (1, 2, 3):
+                raise PyQRuntimeError(
+                    "intervalle() attend un, deux ou trois arguments",
+                    node
+                )
+
+            if not all(
+                isinstance(value, int) and not isinstance(value, bool)
+                for value in arguments
+            ):
+                raise PyQRuntimeError(
+                    "Les arguments d'intervalle() doivent être des entiers",
+                    node
+                )
+
+            if len(arguments) == 1:
+                return range(arguments[0])
+
+            if len(arguments) == 2:
+                return range(arguments[0], arguments[1])
+
+            if arguments[2] == 0:
+                raise PyQRuntimeError(
+                    "Le pas d'intervalle() ne peut pas être zéro",
+                    node
+                )
+
+            return range(
+                arguments[0],
+                arguments[1],
+                arguments[2]
+            )
+
         if node.name == "afficher":
             if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
