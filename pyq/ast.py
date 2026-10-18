@@ -46,6 +46,12 @@ class ListLiteral(Node):
     line: int | None = None
 
 @dataclass
+class TupleLiteral(Node):
+    elements: list
+    line: int | None = None
+
+
+@dataclass
 class ListComprehension(Node):
     element: Node
     variable: str
