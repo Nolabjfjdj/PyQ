@@ -1,0 +1,5 @@
+afficher(somme([1, 2, 3, 4]))
+afficher(somme((2, 4, 6)))
+afficher(somme(intervalle(5)))
+afficher(somme([1.5, 2.5], 10))
+afficher(somme([]))
