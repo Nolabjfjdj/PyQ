@@ -6,6 +6,7 @@ from .ast import (
     NullLiteral,
     Identifier,
     ListLiteral,
+    TupleLiteral,
     ListComprehension,
     DictLiteral,
     DictComprehension,
@@ -921,9 +922,35 @@ class Parser:
         if token.type == "LPAREN":
             self.advance()
 
-            expression = self.parse_expression()
+            if self.current().type == "RPAREN":
+                self.advance()
+                expression = TupleLiteral(
+                    [],
+                    line=token.position
+                )
+                return self.parse_postfix(expression)
 
-            self.expect("RPAREN")
+            first = self.parse_expression()
+
+            if self.current().type == "COMMA":
+                elements = [first]
+
+                while self.current().type == "COMMA":
+                    self.advance()
+
+                    if self.current().type == "RPAREN":
+                        break
+
+                    elements.append(self.parse_expression())
+
+                self.expect("RPAREN")
+                expression = TupleLiteral(
+                    elements,
+                    line=token.position
+                )
+            else:
+                self.expect("RPAREN")
+                expression = first
 
             return self.parse_postfix(expression)
 
