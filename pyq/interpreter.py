@@ -810,6 +810,23 @@ class Interpreter:
 
         arguments = positional_arguments
 
+        if node.name == "taille":
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    "taille() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if isinstance(value, (str, list, tuple, dict, range)):
+                return len(value)
+
+            raise PyQRuntimeError(
+                "taille() attend une chaîne, une liste, un tuple, un dictionnaire ou un intervalle",
+                node
+            )
+
         if node.name == "intervalle":
             if named_arguments:
                 raise PyQRuntimeError(
