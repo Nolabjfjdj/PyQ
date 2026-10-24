@@ -1,3 +1,4 @@
+import math
 from pathlib import Path
 
 from pyq.lexer import Lexer
@@ -837,6 +838,29 @@ class Interpreter:
                     "Impossible de calculer cette puissance",
                     node
                 ) from error
+
+        if node.name == "racine_carree":
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    "racine_carree() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise PyQRuntimeError(
+                    "racine_carree() attend un nombre",
+                    node
+                )
+
+            if value < 0:
+                raise PyQRuntimeError(
+                    "racine_carree() ne peut pas calculer la racine d'un nombre négatif",
+                    node
+                )
+
+            return math.sqrt(value)
 
         if node.name == "arrondir":
             if named_arguments or len(arguments) not in (1, 2):
