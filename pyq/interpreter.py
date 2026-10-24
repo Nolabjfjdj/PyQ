@@ -1574,7 +1574,7 @@ class Interpreter:
             )
             return
 
-        print(value)
+        print(self.format_value(value))
 
     def format_value(self, value):
         if value is None:
@@ -1588,6 +1588,9 @@ class Interpreter:
 
         if isinstance(value, str):
             return value
+
+        if isinstance(value, float) and value.is_integer():
+            return str(int(value))
 
         if isinstance(value, list):
             return (
