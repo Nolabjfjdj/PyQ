@@ -1,0 +1,5 @@
+afficher(minimum([8, 3, 12, 5]))
+afficher(maximum(intervalle(10)))
+afficher(minimum(7, -2, 4, 1))
+afficher(maximum("banane"))
+afficher(minimum((6, 2, 9)))
