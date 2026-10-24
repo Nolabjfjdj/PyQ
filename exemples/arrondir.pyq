@@ -1,0 +1,4 @@
+afficher(arrondir(3.14159))
+afficher(arrondir(3.14159, 2))
+afficher(arrondir(8.76, 1))
+afficher(arrondir(-2.7))
