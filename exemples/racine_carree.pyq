@@ -1,0 +1,5 @@
+afficher(racine_carree(25))
+afficher(racine_carree(2))
+afficher(racine_carree(0))
+afficher(racine_carree(81))
+afficher(racine_carree(0.25))
