@@ -1,0 +1,4 @@
+afficher(valeur_absolue(-12))
+afficher(valeur_absolue(-3.5))
+afficher(valeur_absolue(0))
+afficher(valeur_absolue(8))
