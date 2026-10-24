@@ -839,6 +839,23 @@ class Interpreter:
                     node
                 ) from error
 
+        if node.name == "plafond":
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    "plafond() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise PyQRuntimeError(
+                    "plafond() attend un nombre",
+                    node
+                )
+
+            return math.ceil(value)
+
         if node.name == "plancher":
             if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
