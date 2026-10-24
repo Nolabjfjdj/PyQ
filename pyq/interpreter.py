@@ -839,6 +839,23 @@ class Interpreter:
                     node
                 ) from error
 
+        if node.name == "plancher":
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    "plancher() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise PyQRuntimeError(
+                    "plancher() attend un nombre",
+                    node
+                )
+
+            return math.floor(value)
+
         if node.name == "diviser_entier":
             if len(arguments) != 2 or named_arguments:
                 raise PyQRuntimeError(
