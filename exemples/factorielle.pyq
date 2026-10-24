@@ -1,0 +1,5 @@
+afficher(factorielle(0))
+afficher(factorielle(1))
+afficher(factorielle(5))
+afficher(factorielle(10))
+afficher(factorielle(12))
