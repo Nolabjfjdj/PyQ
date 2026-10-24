@@ -810,6 +810,34 @@ class Interpreter:
 
         arguments = positional_arguments
 
+        if node.name == "puissance":
+            if len(arguments) != 2 or named_arguments:
+                raise PyQRuntimeError(
+                    "puissance() attend exactement deux arguments : la base et l'exposant",
+                    node
+                )
+
+            base, exponent = arguments
+
+            if (
+                not isinstance(base, (int, float))
+                or isinstance(base, bool)
+                or not isinstance(exponent, (int, float))
+                or isinstance(exponent, bool)
+            ):
+                raise PyQRuntimeError(
+                    "puissance() attend deux nombres",
+                    node
+                )
+
+            try:
+                return base ** exponent
+            except (OverflowError, ZeroDivisionError, ValueError) as error:
+                raise PyQRuntimeError(
+                    "Impossible de calculer cette puissance",
+                    node
+                ) from error
+
         if node.name == "arrondir":
             if named_arguments or len(arguments) not in (1, 2):
                 raise PyQRuntimeError(
