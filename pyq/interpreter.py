@@ -365,56 +365,7 @@ class Interpreter:
         ]
 
         if isinstance(target, list):
-            if node.name in ("minimum", "maximum"):
-            if named_arguments:
-                raise PyQRuntimeError(
-                    f"{node.name}() n'accepte pas d'arguments nommés",
-                    node
-                )
-
-            if len(arguments) == 0:
-                raise PyQRuntimeError(
-                    f"{node.name}() attend au moins un argument",
-                    node
-                )
-
-            if len(arguments) == 1:
-                iterable = arguments[0]
-
-                if not isinstance(iterable, (str, list, tuple, range, dict)):
-                    raise PyQRuntimeError(
-                        f"{node.name}() attend une chaîne, une liste, un tuple, un dictionnaire ou un intervalle",
-                        node
-                    )
-
-                values = list(iterable)
-
-                if not values:
-                    raise PyQRuntimeError(
-                        f"{node.name}() ne peut pas être utilisé avec une collection vide",
-                        node
-                    )
-            else:
-                values = arguments
-
-            try:
-                result = values[0]
-
-                for value in values[1:]:
-                    if (
-                        (node.name == "minimum" and value < result)
-                        or (node.name == "maximum" and value > result)
-                    ):
-                        result = value
-
-                return result
-            except TypeError:
-                raise PyQRuntimeError(
-                    f"{node.name}() ne peut pas comparer ces valeurs entre elles",
-                    node
-                )
-
-        if node.name == "taille":
+            if node.name == "taille":
                 if len(arguments) != 0:
                     raise PyQRuntimeError(
                         "taille() n'attend aucun argument",
@@ -893,6 +844,55 @@ class Interpreter:
                 total += value
 
             return total
+
+        if node.name in ("minimum", "maximum"):
+            if named_arguments:
+                raise PyQRuntimeError(
+                    f"{node.name}() n'accepte pas d'arguments nommés",
+                    node
+                )
+
+            if len(arguments) == 0:
+                raise PyQRuntimeError(
+                    f"{node.name}() attend au moins un argument",
+                    node
+                )
+
+            if len(arguments) == 1:
+                iterable = arguments[0]
+
+                if not isinstance(iterable, (str, list, tuple, range, dict)):
+                    raise PyQRuntimeError(
+                        f"{node.name}() attend une chaîne, une liste, un tuple, un dictionnaire ou un intervalle",
+                        node
+                    )
+
+                values = list(iterable)
+
+                if not values:
+                    raise PyQRuntimeError(
+                        f"{node.name}() ne peut pas être utilisé avec une collection vide",
+                        node
+                    )
+            else:
+                values = arguments
+
+            try:
+                result = values[0]
+
+                for value in values[1:]:
+                    if (
+                        (node.name == "minimum" and value < result)
+                        or (node.name == "maximum" and value > result)
+                    ):
+                        result = value
+
+                return result
+            except TypeError:
+                raise PyQRuntimeError(
+                    f"{node.name}() ne peut pas comparer ces valeurs entre elles",
+                    node
+                )
 
         if node.name == "taille":
             if len(arguments) != 1 or named_arguments:
