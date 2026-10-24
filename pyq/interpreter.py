@@ -839,6 +839,40 @@ class Interpreter:
                     node
                 ) from error
 
+        if node.name == "diviser_entier":
+            if len(arguments) != 2 or named_arguments:
+                raise PyQRuntimeError(
+                    "diviser_entier() attend exactement deux arguments",
+                    node
+                )
+
+            dividend, divisor = arguments
+
+            if (
+                not isinstance(dividend, (int, float))
+                or isinstance(dividend, bool)
+                or not isinstance(divisor, (int, float))
+                or isinstance(divisor, bool)
+            ):
+                raise PyQRuntimeError(
+                    "diviser_entier() attend deux nombres",
+                    node
+                )
+
+            if divisor == 0:
+                raise PyQRuntimeError(
+                    "Division par zéro dans diviser_entier()",
+                    node
+                )
+
+            try:
+                return dividend // divisor
+            except (OverflowError, ValueError) as error:
+                raise PyQRuntimeError(
+                    "Impossible d'effectuer cette division entière",
+                    node
+                ) from error
+
         if node.name == "factorielle":
             if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
