@@ -810,6 +810,23 @@ class Interpreter:
 
         arguments = positional_arguments
 
+        if node.name == "valeur_absolue":
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    "valeur_absolue() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise PyQRuntimeError(
+                    "valeur_absolue() attend un nombre",
+                    node
+                )
+
+            return abs(value)
+
         if node.name == "somme":
             if named_arguments or len(arguments) not in (1, 2):
                 raise PyQRuntimeError(
