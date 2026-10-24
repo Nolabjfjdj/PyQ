@@ -1,0 +1,5 @@
+afficher(plancher(3.8))
+afficher(plancher(3.0))
+afficher(plancher(-2.3))
+afficher(plancher(0))
+afficher(plancher(12.99))
