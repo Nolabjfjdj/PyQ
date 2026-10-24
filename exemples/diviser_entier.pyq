@@ -1,0 +1,5 @@
+afficher(diviser_entier(10, 3))
+afficher(diviser_entier(9, 3))
+afficher(diviser_entier(-10, 3))
+afficher(diviser_entier(10.5, 2))
+afficher(diviser_entier(0, 7))
