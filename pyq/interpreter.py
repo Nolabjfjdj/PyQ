@@ -839,6 +839,29 @@ class Interpreter:
                     node
                 ) from error
 
+        if node.name == "factorielle":
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    "factorielle() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if not isinstance(value, int) or isinstance(value, bool):
+                raise PyQRuntimeError(
+                    "factorielle() attend un entier",
+                    node
+                )
+
+            if value < 0:
+                raise PyQRuntimeError(
+                    "factorielle() attend un entier positif ou nul",
+                    node
+                )
+
+            return math.factorial(value)
+
         if node.name == "racine_carree":
             if len(arguments) != 1 or named_arguments:
                 raise PyQRuntimeError(
