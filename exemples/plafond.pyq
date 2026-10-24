@@ -1,0 +1,5 @@
+afficher(plafond(3.2))
+afficher(plafond(3.0))
+afficher(plafond(-2.3))
+afficher(plafond(0))
+afficher(plafond(12.01))
