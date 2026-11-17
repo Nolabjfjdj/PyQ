@@ -358,6 +358,31 @@ class Interpreter:
                     raise PyQRuntimeError("copier() n'attend aucun argument", node)
                 return target.copy()
 
+        if isinstance(target, tuple):
+            if node.name == "taille":
+                if arguments:
+                    raise PyQRuntimeError("taille() n'attend aucun argument", node)
+                return len(target)
+            if node.name == "contient":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("contient() attend exactement un argument", node)
+                return arguments[0] in target
+            if node.name == "compter":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("compter() attend exactement un argument", node)
+                return target.count(arguments[0])
+            if node.name == "position":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("position() attend exactement un argument", node)
+                try:
+                    return target.index(arguments[0])
+                except ValueError as error:
+                    raise PyQRuntimeError("Élément introuvable dans le tuple", node) from error
+            if node.name == "inverser":
+                if arguments:
+                    raise PyQRuntimeError("inverser() n'attend aucun argument", node)
+                return target[::-1]
+
         if isinstance(target, set):
             if node.name == "taille":
                 if arguments:
