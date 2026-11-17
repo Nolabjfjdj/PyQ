@@ -1,0 +1,14 @@
+nombres = ensemble([1, 2, 2, 3, 4])
+autres = ensemble([3, 4, 5, 6])
+
+afficher(nombres)
+afficher(nombres.taille())
+afficher(nombres.contient(2))
+
+nombres.ajouter(8)
+nombres.retirer(1)
+
+afficher(nombres)
+afficher(nombres.union(autres))
+afficher(nombres.intersection(autres))
+afficher(nombres.difference(autres))
