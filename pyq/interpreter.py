@@ -257,7 +257,50 @@ class Interpreter:
             return target[index]
 
         except (IndexError, KeyError, TypeError):
-            if isinstance(target, str):
+            if isinstance(target, set):
+            if node.name == "taille":
+                if arguments:
+                    raise PyQRuntimeError("taille() n'attend aucun argument", node)
+                return len(target)
+
+            if node.name == "ajouter":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("ajouter() attend exactement un argument", node)
+                try:
+                    target.add(arguments[0])
+                except TypeError as error:
+                    raise PyQRuntimeError("Un ensemble ne peut contenir que des valeurs non modifiables", node) from error
+                return None
+
+            if node.name == "retirer":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("retirer() attend exactement un argument", node)
+                if arguments[0] not in target:
+                    raise PyQRuntimeError("Élément introuvable dans l'ensemble", node)
+                target.remove(arguments[0])
+                return None
+
+            if node.name == "contient":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("contient() attend exactement un argument", node)
+                return arguments[0] in target
+
+            if node.name == "union":
+                if len(arguments) != 1 or not isinstance(arguments[0], set):
+                    raise PyQRuntimeError("union() attend un ensemble", node)
+                return target | arguments[0]
+
+            if node.name == "intersection":
+                if len(arguments) != 1 or not isinstance(arguments[0], set):
+                    raise PyQRuntimeError("intersection() attend un ensemble", node)
+                return target & arguments[0]
+
+            if node.name == "difference":
+                if len(arguments) != 1 or not isinstance(arguments[0], set):
+                    raise PyQRuntimeError("difference() attend un ensemble", node)
+                return target - arguments[0]
+
+        if isinstance(target, str):
                 if isinstance(index, int):
                     raise PyQRuntimeError(
                         f"Index de chaîne hors limites : {index}",
@@ -810,6 +853,16 @@ class Interpreter:
                 positional_arguments.append(self.execute(argument))
 
         arguments = positional_arguments
+
+        if node.name == "ensemble":
+            if len(arguments) > 1 or named_arguments:
+                raise PyQRuntimeError("ensemble() attend zéro ou un argument", node)
+            if not arguments:
+                return set()
+            try:
+                return set(arguments[0])
+            except TypeError as error:
+                raise PyQRuntimeError("ensemble() attend une valeur parcourable contenant des éléments non modifiables", node) from error
 
         if node.name in ("texte", "entier", "decimal", "booleen", "type_de"):
             if len(arguments) != 1 or named_arguments:
@@ -1785,6 +1838,16 @@ class Interpreter:
                 contents += ","
             print("(" + contents + ")")
             return
+
+        if isinstance(value, set):
+            print(self.format_value(value))
+            return
+
+        if isinstance(value, set):
+            return "{" + ", ".join(
+                self.format_value(item)
+                for item in sorted(value, key=lambda item: repr(item))
+            ) + "}"
 
         if isinstance(value, dict):
             entries = []
