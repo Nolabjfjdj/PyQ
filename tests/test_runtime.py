@@ -75,6 +75,22 @@ class PyQRuntimeTests(unittest.TestCase):
         )
         self.assertEqual(result, ["0", "1", "180", "3.141592653589793", "2", "2.71828"])
 
+    def test_collection_constructors_and_helpers(self):
+        result = self.run_program(
+            "afficher(liste())\\n"
+            "afficher(liste((1, 2)))\\n"
+            "afficher(tuple([3, 4]))\\n"
+            "afficher(dictionnaire([(\"nom\", \"PyQ\")]))\\n"
+            "afficher(enumerer([\"a\", \"b\"]))\\n"
+            "afficher(trier([3, 1, 2]))\\n"
+            "afficher(trier([3, 1, 2], vrai))\\n"
+            "afficher(inverser([1, 2, 3]))\\n"
+        )
+        self.assertEqual(
+            result,
+            ["[]", "[1, 2]", "(3, 4)", "{nom: PyQ}", "[(0, a), (1, b)]", "[1, 2, 3]", "[3, 2, 1]", "[3, 2, 1]"]
+        )
+
     def test_set_display(self):
         result = self.run_program(
             "valeurs = ensemble([3, 1, 2])\\n"
