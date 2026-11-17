@@ -1,0 +1,79 @@
+import contextlib
+import io
+import unittest
+
+from pyq.interpreter import Interpreter
+from pyq.lexer import Lexer
+from pyq.parser import Parser
+
+
+class PyQRuntimeTests(unittest.TestCase):
+    def run_program(self, source):
+        output = io.StringIO()
+        interpreter = Interpreter()
+
+        with contextlib.redirect_stdout(output):
+            tokens = Lexer(source).tokenize()
+            program = Parser(tokens).parse()
+            interpreter.execute(program)
+
+        return output.getvalue().splitlines()
+
+    def test_try_except_finally(self):
+        result = self.run_program(
+            "essayer:\n"
+            "    valeur = 10 / 0\n"
+            "sauf erreur:\n"
+            "    afficher(erreur)\n"
+            "enfin:\n"
+            "    afficher(\"termine\")\n"
+        )
+        self.assertEqual(result, ["Division par zéro", "termine"])
+
+    def test_type_conversions(self):
+        result = self.run_program(
+            "afficher(entier(\"42\"))\n"
+            "afficher(decimal(\"2.5\"))\n"
+            "afficher(texte(12))\n"
+            "afficher(booleen(1))\n"
+            "afficher(type_de(nul))\n"
+        )
+        self.assertEqual(result, ["42", "2.5", "12", "vrai", "nul"])
+
+    def test_type_checks(self):
+        result = self.run_program(
+            "afficher(est_nombre(12))\n"
+            "afficher(est_texte(\"PyQ\"))\n"
+            "afficher(est_liste([]))\n"
+            "afficher(est_tuple((1, 2)))\n"
+            "afficher(est_dictionnaire({}))\n"
+            "afficher(est_booleen(vrai))\n"
+            "afficher(est_nul(nul))\n"
+        )
+        self.assertEqual(result, ["vrai"] * 7)
+
+    def test_sets(self):
+        result = self.run_program(
+            "a = ensemble([1, 2, 2, 3])\n"
+            "b = ensemble([3, 4])\n"
+            "afficher(a.taille())\n"
+            "afficher(a.union(b))\n"
+            "afficher(a.intersection(b))\n"
+            "afficher(a.difference(b))\n"
+        )
+        self.assertEqual(result, ["3", "{1, 2, 3, 4}", "{3}", "{1, 2}"])
+
+    def test_list_and_dictionary_methods(self):
+        result = self.run_program(
+            "liste = [3, 1, 2]\n"
+            "liste.trier()\n"
+            "afficher(liste)\n"
+            "profil = {\"nom\": \"PyQ\"}\n"
+            "afficher(profil.obtenir(\"nom\"))\n"
+            "afficher(profil.cles())\n"
+        )
+        self.assertEqual(result, ["[1, 2, 3]", "PyQ", "[nom]"])
+
+
+if __name__ == "__main__":
+    unittest.main()
