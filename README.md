@@ -60,6 +60,7 @@ PyQ prend actuellement en charge :
 - Listes imbriquées
 - Constructeurs `liste()`, `tuple()` et `dictionnaire()`
 - Fonctions de collections `enumerer()`, `trier()` et `inverser()`
+- Tests logiques de collections avec `tous()` et `au_moins_un()`
 - Dictionnaires
 - Dictionnaires imbriqués
 - Accès et modification des éléments
