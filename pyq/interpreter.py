@@ -1217,6 +1217,59 @@ class Interpreter:
 
             return math.sqrt(value)
 
+        if node.name in ("sinus", "cosinus", "tangente", "degres", "radians", "exponentielle"):
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    f"{node.name}() attend exactement un nombre",
+                    node
+                )
+
+            value = arguments[0]
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise PyQRuntimeError(
+                    f"{node.name}() attend un nombre",
+                    node
+                )
+
+            try:
+                if node.name == "sinus":
+                    return math.sin(value)
+                if node.name == "cosinus":
+                    return math.cos(value)
+                if node.name == "tangente":
+                    return math.tan(value)
+                if node.name == "degres":
+                    return math.degrees(value)
+                if node.name == "radians":
+                    return math.radians(value)
+                return math.exp(value)
+            except (OverflowError, ValueError) as error:
+                raise PyQRuntimeError(
+                    f"Calcul impossible avec {node.name}()",
+                    node
+                ) from error
+
+        if node.name == "logarithme":
+            if named_arguments or len(arguments) not in (1, 2):
+                raise PyQRuntimeError(
+                    "logarithme() attend une valeur et éventuellement une base",
+                    node
+                )
+
+            value = arguments[0]
+            base = arguments[1] if len(arguments) == 2 else None
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                raise PyQRuntimeError("logarithme() attend un nombre", node)
+            if value <= 0:
+                raise PyQRuntimeError("logarithme() attend une valeur strictement positive", node)
+            if base is not None:
+                if not isinstance(base, (int, float)) or isinstance(base, bool):
+                    raise PyQRuntimeError("La base de logarithme() doit être un nombre", node)
+                if base <= 0 or base == 1:
+                    raise PyQRuntimeError("La base de logarithme() doit être positive et différente de 1", node)
+                return math.log(value, base)
+            return math.log(value)
+
         if node.name == "arrondir":
             if named_arguments or len(arguments) not in (1, 2):
                 raise PyQRuntimeError(
@@ -1969,12 +2022,6 @@ class Interpreter:
             print(self.format_value(value))
             return
 
-        if isinstance(value, set):
-            return "{" + ", ".join(
-                self.format_value(item)
-                for item in sorted(value, key=lambda item: repr(item))
-            ) + "}"
-
         if isinstance(value, dict):
             entries = []
 
@@ -2027,6 +2074,12 @@ class Interpreter:
             if len(value) == 1:
                 contents += ","
             return "(" + contents + ")"
+
+        if isinstance(value, set):
+            return "{" + ", ".join(
+                self.format_value(item)
+                for item in sorted(value, key=lambda item: repr(item))
+            ) + "}"
 
         if isinstance(value, dict):
             entries = []
