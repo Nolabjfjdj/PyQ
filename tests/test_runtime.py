@@ -66,25 +66,25 @@ class PyQRuntimeTests(unittest.TestCase):
 
     def test_math_functions(self):
         result = self.run_program(
-            "afficher(arrondir(sinus(0), 5))\\n"
-            "afficher(arrondir(cosinus(0), 5))\\n"
-            "afficher(degres(3.141592653589793))\\n"
-            "afficher(radians(180))\\n"
-            "afficher(logarithme(100, 10))\\n"
-            "afficher(arrondir(exponentielle(1), 5))\\n"
+            "afficher(arrondir(sinus(0), 5))\n"
+            "afficher(arrondir(cosinus(0), 5))\n"
+            "afficher(degres(3.141592653589793))\n"
+            "afficher(radians(180))\n"
+            "afficher(logarithme(100, 10))\n"
+            "afficher(arrondir(exponentielle(1), 5))\n"
         )
         self.assertEqual(result, ["0", "1", "180", "3.141592653589793", "2", "2.71828"])
 
     def test_collection_constructors_and_helpers(self):
         result = self.run_program(
-            "afficher(liste())\\n"
-            "afficher(liste((1, 2)))\\n"
-            "afficher(tuple([3, 4]))\\n"
-            "afficher(dictionnaire([(\"nom\", \"PyQ\")]))\\n"
-            "afficher(enumerer([\"a\", \"b\"]))\\n"
-            "afficher(trier([3, 1, 2]))\\n"
-            "afficher(trier([3, 1, 2], vrai))\\n"
-            "afficher(inverser([1, 2, 3]))\\n"
+            "afficher(liste())\n"
+            "afficher(liste((1, 2)))\n"
+            "afficher(tuple([3, 4]))\n"
+            "afficher(dictionnaire([(\"nom\", \"PyQ\")]))\n"
+            "afficher(enumerer([\"a\", \"b\"]))\n"
+            "afficher(trier([3, 1, 2]))\n"
+            "afficher(trier([3, 1, 2], vrai))\n"
+            "afficher(inverser([1, 2, 3]))\n"
         )
         self.assertEqual(
             result,
@@ -93,19 +93,19 @@ class PyQRuntimeTests(unittest.TestCase):
 
     def test_set_display(self):
         result = self.run_program(
-            "valeurs = ensemble([3, 1, 2])\\n"
-            "afficher(valeurs)\\n"
-            "afficher(texte(valeurs))\\n"
+            "valeurs = ensemble([3, 1, 2])\n"
+            "afficher(valeurs)\n"
+            "afficher(texte(valeurs))\n"
         )
         self.assertEqual(result, ["{1, 2, 3}", "{1, 2, 3}"])
 
     def test_tuple_methods(self):
         result = self.run_program(
-            "valeurs = (1, 2, 2, 3)\\n"
-            "afficher(valeurs.taille())\\n"
-            "afficher(valeurs.compter(2))\\n"
-            "afficher(valeurs.position(3))\\n"
-            "afficher(valeurs.inverser())\\n"
+            "valeurs = (1, 2, 2, 3)\n"
+            "afficher(valeurs.taille())\n"
+            "afficher(valeurs.compter(2))\n"
+            "afficher(valeurs.position(3))\n"
+            "afficher(valeurs.inverser())\n"
         )
         self.assertEqual(result, ["4", "2", "3", "(3, 2, 2, 1)"])
 
