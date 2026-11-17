@@ -57,11 +57,15 @@ class PyQRuntimeTests(unittest.TestCase):
             "a = ensemble([1, 2, 2, 3])\n"
             "b = ensemble([3, 4])\n"
             "afficher(a.taille())\n"
+            "afficher(taille(a))\n"
+            "afficher(somme(a))\n"
+            "afficher(minimum(a))\n"
+            "afficher(maximum(a))\n"
             "afficher(a.union(b))\n"
             "afficher(a.intersection(b))\n"
             "afficher(a.difference(b))\n"
         )
-        self.assertEqual(result, ["3", "{1, 2, 3, 4}", "{3}", "{1, 2}"])
+        self.assertEqual(result, ["3", "3", "6", "1", "3", "{1, 2, 3, 4}", "{3}", "{1, 2}"])
 
 
     def test_math_functions(self):
