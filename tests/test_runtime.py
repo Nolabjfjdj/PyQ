@@ -63,6 +63,16 @@ class PyQRuntimeTests(unittest.TestCase):
         )
         self.assertEqual(result, ["3", "{1, 2, 3, 4}", "{3}", "{1, 2}"])
 
+    def test_tuple_methods(self):
+        result = self.run_program(
+            "valeurs = (1, 2, 2, 3)\\n"
+            "afficher(valeurs.taille())\\n"
+            "afficher(valeurs.compter(2))\\n"
+            "afficher(valeurs.position(3))\\n"
+            "afficher(valeurs.inverser())\\n"
+        )
+        self.assertEqual(result, ["4", "2", "3", "(3, 2, 2, 1)"])
+
     def test_list_and_dictionary_methods(self):
         result = self.run_program(
             "liste = [3, 1, 2]\n"
