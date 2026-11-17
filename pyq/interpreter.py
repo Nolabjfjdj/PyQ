@@ -257,7 +257,108 @@ class Interpreter:
             return target[index]
 
         except (IndexError, KeyError, TypeError):
-            if isinstance(target, set):
+            if isinstance(target, list):
+            if node.name == "vider":
+                if arguments:
+                    raise PyQRuntimeError("vider() n'attend aucun argument", node)
+                target.clear()
+                return None
+            if node.name == "copier":
+                if arguments:
+                    raise PyQRuntimeError("copier() n'attend aucun argument", node)
+                return target.copy()
+            if node.name == "inverser":
+                if arguments:
+                    raise PyQRuntimeError("inverser() n'attend aucun argument", node)
+                target.reverse()
+                return None
+            if node.name == "trier":
+                if len(arguments) > 1:
+                    raise PyQRuntimeError("trier() attend zéro ou un argument", node)
+                try:
+                    target.sort(reverse=bool(arguments[0]) if arguments else False)
+                except TypeError as error:
+                    raise PyQRuntimeError("Les éléments de la liste ne peuvent pas être triés ensemble", node) from error
+                return None
+            if node.name == "compter":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("compter() attend exactement un argument", node)
+                return target.count(arguments[0])
+            if node.name == "position":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("position() attend exactement un argument", node)
+                try:
+                    return target.index(arguments[0])
+                except ValueError as error:
+                    raise PyQRuntimeError("Élément introuvable dans la liste", node) from error
+            if node.name == "inserer":
+                if len(arguments) != 2 or not isinstance(arguments[0], int):
+                    raise PyQRuntimeError("inserer() attend un index entier et une valeur", node)
+                target.insert(arguments[0], arguments[1])
+                return None
+            if node.name == "ajouter_tout":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("ajouter_tout() attend exactement un argument", node)
+                try:
+                    target.extend(arguments[0])
+                except TypeError as error:
+                    raise PyQRuntimeError("ajouter_tout() attend une valeur parcourable", node) from error
+                return None
+            if node.name == "retirer_dernier":
+                if arguments:
+                    raise PyQRuntimeError("retirer_dernier() n'attend aucun argument", node)
+                if not target:
+                    raise PyQRuntimeError("Impossible de retirer un élément d'une liste vide", node)
+                return target.pop()
+
+        if isinstance(target, dict):
+            if node.name == "taille":
+                if arguments:
+                    raise PyQRuntimeError("taille() n'attend aucun argument", node)
+                return len(target)
+            if node.name == "cles":
+                if arguments:
+                    raise PyQRuntimeError("cles() n'attend aucun argument", node)
+                return list(target.keys())
+            if node.name == "valeurs":
+                if arguments:
+                    raise PyQRuntimeError("valeurs() n'attend aucun argument", node)
+                return list(target.values())
+            if node.name == "elements":
+                if arguments:
+                    raise PyQRuntimeError("elements() n'attend aucun argument", node)
+                return [tuple(item) for item in target.items()]
+            if node.name == "obtenir":
+                if len(arguments) not in (1, 2):
+                    raise PyQRuntimeError("obtenir() attend une clé et éventuellement une valeur par défaut", node)
+                return target.get(*arguments)
+            if node.name == "contient":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("contient() attend exactement un argument", node)
+                return arguments[0] in target
+            if node.name == "supprimer":
+                if len(arguments) != 1:
+                    raise PyQRuntimeError("supprimer() attend exactement une clé", node)
+                if arguments[0] not in target:
+                    raise PyQRuntimeError(f"Clé inexistante : {arguments[0]}", node)
+                del target[arguments[0]]
+                return None
+            if node.name == "fusionner":
+                if len(arguments) != 1 or not isinstance(arguments[0], dict):
+                    raise PyQRuntimeError("fusionner() attend un dictionnaire", node)
+                target.update(arguments[0])
+                return None
+            if node.name == "vider":
+                if arguments:
+                    raise PyQRuntimeError("vider() n'attend aucun argument", node)
+                target.clear()
+                return None
+            if node.name == "copier":
+                if arguments:
+                    raise PyQRuntimeError("copier() n'attend aucun argument", node)
+                return target.copy()
+
+        if isinstance(target, set):
             if node.name == "taille":
                 if arguments:
                     raise PyQRuntimeError("taille() n'attend aucun argument", node)
