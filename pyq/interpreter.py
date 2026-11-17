@@ -1380,6 +1380,25 @@ class Interpreter:
 
             return abs(value)
 
+        if node.name in ("tous", "au_moins_un"):
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    f"{node.name}() attend exactement une collection",
+                    node
+                )
+
+            try:
+                values = iter(arguments[0])
+            except TypeError as error:
+                raise PyQRuntimeError(
+                    f"{node.name}() attend une valeur parcourable",
+                    node
+                ) from error
+
+            if node.name == "tous":
+                return all(self.is_truthy(value) for value in values)
+            return any(self.is_truthy(value) for value in values)
+
         if node.name == "somme":
             if named_arguments or len(arguments) not in (1, 2):
                 raise PyQRuntimeError(
