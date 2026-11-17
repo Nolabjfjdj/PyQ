@@ -1392,7 +1392,7 @@ class Interpreter:
 
             if not isinstance(iterable, (list, tuple, range, set)):
                 raise PyQRuntimeError(
-                    "somme() attend une liste, un tuple ou un intervalle",
+                    "somme() attend une liste, un tuple, un ensemble ou un intervalle",
                     node
                 )
 
@@ -1433,7 +1433,7 @@ class Interpreter:
 
                 if not isinstance(iterable, (str, list, tuple, range, dict, set)):
                     raise PyQRuntimeError(
-                        f"{node.name}() attend une chaîne, une liste, un tuple, un dictionnaire ou un intervalle",
+                        f"{node.name}() attend une chaîne, une liste, un tuple, un dictionnaire, un ensemble ou un intervalle",
                         node
                     )
 
