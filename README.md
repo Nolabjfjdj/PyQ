@@ -69,6 +69,13 @@ PyQ prend actuellement en charge :
 - Valeurs de retour avec `retourner`
 - Fonctions utilisées dans des expressions
 - Commentaires avec `#`
+- Ensembles avec suppression automatique des doublons
+- Opérations d'union, d'intersection et de différence
+- Conversions natives avec `texte()`, `entier()`, `decimal()` et `booleen()`
+- Identification des types avec `type_de()`
+- Vérification des types avec les fonctions `est_*`
+- Méthodes avancées de listes
+- Méthodes avancées de dictionnaires
 - Gestion des erreurs avec `essayer`, `sauf` et `enfin`
 - Messages d'erreur d'exécution avec numéro de ligne
 
