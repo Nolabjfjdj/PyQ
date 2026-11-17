@@ -37,6 +37,8 @@ PyQ prend actuellement en charge :
 - Nombres entiers et décimaux
 - Valeur `nul`
 - Opérations mathématiques
+- Fonctions trigonométriques `sinus()`, `cosinus()` et `tangente()`
+- Fonctions `logarithme()`, `exponentielle()`, `degres()` et `radians()`
 - Priorité des opérations
 - Parenthèses
 - Modulo `%`
