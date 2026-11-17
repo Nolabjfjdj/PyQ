@@ -1597,3 +1597,13 @@ Sans argument, `liste()`, `tuple()` et `dictionnaire()` créent respectivement u
     afficher(inverser([1, 2, 3]))
 
 Ces fonctions ne modifient pas la collection d'origine.
+
+
+## Tester une collection
+
+`tous()` renvoie vrai si tous les éléments sont considérés comme vrais. Une collection vide renvoie vrai.
+
+`au_moins_un()` renvoie vrai dès qu'un élément est considéré comme vrai. Une collection vide renvoie faux.
+
+    afficher(tous([vrai, 1, "ok"]))
+    afficher(au_moins_un([faux, 0, 2]))
