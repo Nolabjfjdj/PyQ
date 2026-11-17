@@ -1,0 +1,22 @@
+nombre = entier("42")
+prix = decimal("12.5")
+message = texte(2026)
+actif = booleen(1)
+
+afficher(nombre)
+afficher(prix)
+afficher(message)
+afficher(actif)
+
+afficher(type_de(nombre))
+afficher(type_de(prix))
+afficher(type_de(message))
+afficher(type_de(nul))
+
+afficher(est_nombre(nombre))
+afficher(est_texte(message))
+afficher(est_liste([1, 2]))
+afficher(est_tuple((1, 2)))
+afficher(est_dictionnaire({"nom": "PyQ"}))
+afficher(est_booleen(vrai))
+afficher(est_nul(nul))
