@@ -1524,3 +1524,38 @@ La licence complète se trouve dans le fichier :
 Cette documentation a pour objectif d'expliquer PyQ de manière simple tout en servant de référence pour la syntaxe et les fonctionnalités actuellement disponibles.
 
 Lorsque le langage évolue, cette documentation peut être mise à jour afin de correspondre aux nouvelles versions de PyQ.
+
+---
+
+# Fonctions mathématiques avancées
+
+PyQ propose plusieurs fonctions mathématiques natives.
+
+## Trigonométrie
+
+Les fonctions trigonométriques utilisent des angles exprimés en radians.
+
+    sinus(0)
+    cosinus(0)
+    tangente(0)
+
+## Conversion des angles
+
+    radians(180)
+    degres(3.141592653589793)
+
+## Logarithme
+
+`logarithme()` calcule le logarithme naturel avec un seul argument ou le logarithme dans une base donnée avec deux arguments.
+
+    afficher(logarithme(10))
+    afficher(logarithme(100, 10))
+
+La valeur doit être strictement positive. Une base doit également être positive et différente de 1.
+
+## Exponentielle
+
+    afficher(exponentielle(1))
+
+Cette fonction calcule (e^x).
+
