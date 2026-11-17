@@ -1363,6 +1363,81 @@ La documentation doit donc être considérée comme la référence correspondant
 
 ---
 
+# Conversions et types
+
+PyQ propose des fonctions natives pour convertir les valeurs :
+
+    entier("42")
+    decimal("12.5")
+    texte(2026)
+    booleen(1)
+
+La fonction `type_de()` renvoie le nom du type :
+
+    afficher(type_de(42))
+    afficher(type_de("bonjour"))
+
+Les fonctions de vérification disponibles sont :
+
+    est_nombre()
+    est_texte()
+    est_liste()
+    est_tuple()
+    est_dictionnaire()
+    est_booleen()
+    est_nul()
+
+Chaque fonction de vérification reçoit une seule valeur et renvoie un booléen.
+
+# Ensembles
+
+La fonction `ensemble()` crée un ensemble à partir d'une valeur parcourable :
+
+    nombres = ensemble([1, 2, 2, 3])
+
+Les doublons sont automatiquement supprimés.
+
+Les méthodes disponibles comprennent :
+
+    nombres.ajouter(4)
+    nombres.retirer(1)
+    nombres.contient(2)
+    nombres.taille()
+
+Les opérations entre ensembles comprennent :
+
+    premier.union(second)
+    premier.intersection(second)
+    premier.difference(second)
+
+# Méthodes avancées des collections
+
+Les listes disposent notamment des méthodes suivantes :
+
+    liste.vider()
+    liste.copier()
+    liste.inverser()
+    liste.trier()
+    liste.compter(valeur)
+    liste.position(valeur)
+    liste.inserer(index, valeur)
+    liste.ajouter_tout(collection)
+    liste.retirer_dernier()
+
+Les dictionnaires disposent notamment de :
+
+    dictionnaire.cles()
+    dictionnaire.valeurs()
+    dictionnaire.elements()
+    dictionnaire.obtenir(cle)
+    dictionnaire.contient(cle)
+    dictionnaire.supprimer(cle)
+    dictionnaire.fusionner(autre)
+    dictionnaire.vider()
+    dictionnaire.copier()
+
+Ces méthodes complètent les opérations d'indexation et de modification déjà disponibles.
+
 # Version actuelle
 
 **PyQ 0.9**
