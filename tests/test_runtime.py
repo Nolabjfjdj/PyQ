@@ -68,6 +68,16 @@ class PyQRuntimeTests(unittest.TestCase):
         self.assertEqual(result, ["3", "3", "6", "1", "3", "{1, 2, 3, 4}", "{3}", "{1, 2}"])
 
 
+    def test_collection_truth_functions(self):
+        result = self.run_program(
+            "afficher(tous([vrai, 1, \"ok\"]))\n"
+            "afficher(tous([vrai, faux]))\n"
+            "afficher(au_moins_un([faux, 0, 2]))\n"
+            "afficher(au_moins_un([]))\n"
+            "afficher(tous([]))\n"
+        )
+        self.assertEqual(result, ["vrai", "faux", "vrai", "faux", "vrai"])
+
     def test_math_functions(self):
         result = self.run_program(
             "afficher(arrondir(sinus(0), 5))\n"
