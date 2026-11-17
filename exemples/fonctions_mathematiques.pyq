@@ -1,0 +1,20 @@
+afficher("Sinus de zéro :")
+afficher(sinus(0))
+
+afficher("Cosinus de zéro :")
+afficher(cosinus(0))
+
+afficher("Tangente de zéro :")
+afficher(tangente(0))
+
+afficher("180 degrés en radians :")
+afficher(radians(180))
+
+afficher("Pi en degrés :")
+afficher(degres(3.141592653589793))
+
+afficher("Logarithme décimal de 100 :")
+afficher(logarithme(100, 10))
+
+afficher("Exponentielle de 1 :")
+afficher(exponentielle(1))
