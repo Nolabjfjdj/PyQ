@@ -1,0 +1,19 @@
+nombres = liste((4, 2, 8, 1))
+coordonnees = tuple([10, 20])
+profil = dictionnaire([("nom", "PyQ"), ("version", "0.9")])
+
+afficher(nombres)
+afficher(coordonnees)
+afficher(profil)
+
+afficher("Éléments numérotés :")
+afficher(enumerer(["rouge", "vert", "bleu"]))
+
+afficher("Liste triée :")
+afficher(trier(nombres))
+
+afficher("Liste triée en ordre décroissant :")
+afficher(trier(nombres, vrai))
+
+afficher("Liste inversée :")
+afficher(inverser(nombres))
