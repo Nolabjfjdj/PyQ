@@ -1,0 +1,21 @@
+nombres = [4, 2, 8, 2]
+nombres.ajouter_tout([9, 1])
+nombres.inserer(1, 7)
+afficher(nombres.compter(2))
+afficher(nombres.position(8))
+afficher(nombres.copier())
+nombres.trier()
+afficher(nombres)
+afficher(nombres.retirer_dernier())
+nombres.inverser()
+afficher(nombres)
+
+profil = {"nom": "PyQ", "version": 1}
+afficher(profil.cles())
+afficher(profil.valeurs())
+afficher(profil.obtenir("nom"))
+afficher(profil.obtenir("auteur", "LaBanane415"))
+afficher(profil.contient("version"))
+profil.fusionner({"stable": faux})
+profil.supprimer("version")
+afficher(profil)
