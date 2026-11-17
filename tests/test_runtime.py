@@ -63,6 +63,26 @@ class PyQRuntimeTests(unittest.TestCase):
         )
         self.assertEqual(result, ["3", "{1, 2, 3, 4}", "{3}", "{1, 2}"])
 
+
+    def test_math_functions(self):
+        result = self.run_program(
+            "afficher(arrondir(sinus(0), 5))\\n"
+            "afficher(arrondir(cosinus(0), 5))\\n"
+            "afficher(degres(3.141592653589793))\\n"
+            "afficher(radians(180))\\n"
+            "afficher(logarithme(100, 10))\\n"
+            "afficher(arrondir(exponentielle(1), 5))\\n"
+        )
+        self.assertEqual(result, ["0", "1", "180", "3.141592653589793", "2", "2.71828"])
+
+    def test_set_display(self):
+        result = self.run_program(
+            "valeurs = ensemble([3, 1, 2])\\n"
+            "afficher(valeurs)\\n"
+            "afficher(texte(valeurs))\\n"
+        )
+        self.assertEqual(result, ["{1, 2, 3}", "{1, 2, 3}"])
+
     def test_tuple_methods(self):
         result = self.run_program(
             "valeurs = (1, 2, 2, 3)\\n"
