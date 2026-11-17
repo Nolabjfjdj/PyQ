@@ -980,6 +980,74 @@ class Interpreter:
 
         arguments = positional_arguments
 
+        if node.name in ("liste", "tuple", "dictionnaire", "enumerer", "trier", "inverser"):
+            if named_arguments:
+                raise PyQRuntimeError(
+                    f"{node.name}() n'accepte pas d'arguments nommés",
+                    node
+                )
+
+            if node.name in ("liste", "tuple", "dictionnaire"):
+                if len(arguments) > 1:
+                    raise PyQRuntimeError(
+                        f"{node.name}() attend zéro ou un argument",
+                        node
+                    )
+
+                source = arguments[0] if arguments else None
+
+                if node.name == "liste":
+                    if source is None:
+                        return []
+                    try:
+                        return list(source)
+                    except TypeError as error:
+                        raise PyQRuntimeError(
+                            "liste() attend une valeur parcourable",
+                            node
+                        ) from error
+
+                if node.name == "tuple":
+                    if source is None:
+                        return ()
+                    try:
+                        return tuple(source)
+                    except TypeError as error:
+                        raise PyQRuntimeError(
+                            "tuple() attend une valeur parcourable",
+                            node
+                        ) from error
+
+                if source is None:
+                    return {}
+                try:
+                    return dict(source)
+                except (TypeError, ValueError) as error:
+                    raise PyQRuntimeError(
+                        "dictionnaire() attend un dictionnaire ou une collection de paires clé-valeur",
+                        node
+                    ) from error
+
+            if len(arguments) not in (1, 2) if node.name == "trier" else len(arguments) != 1:
+                expected = "un ou deux arguments" if node.name == "trier" else "exactement un argument"
+                raise PyQRuntimeError(
+                    f"{node.name}() attend {expected}",
+                    node
+                )
+
+            try:
+                if node.name == "enumerer":
+                    return list(enumerate(arguments[0]))
+                if node.name == "inverser":
+                    return list(reversed(arguments[0]))
+                reverse = bool(arguments[1]) if len(arguments) == 2 else False
+                return sorted(arguments[0], reverse=reverse)
+            except (TypeError, ValueError) as error:
+                raise PyQRuntimeError(
+                    f"Impossible d'utiliser {node.name}() avec cette valeur",
+                    node
+                ) from error
+
         if node.name == "ensemble":
             if len(arguments) > 1 or named_arguments:
                 raise PyQRuntimeError("ensemble() attend zéro ou un argument", node)
