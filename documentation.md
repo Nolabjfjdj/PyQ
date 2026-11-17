@@ -1559,3 +1559,41 @@ La valeur doit être strictement positive. Une base doit également être positi
 
 Cette fonction calcule (e^x).
 
+
+
+---
+
+# Constructeurs et fonctions de collections
+
+PyQ fournit des fonctions natives pour créer et parcourir des collections.
+
+## Constructeurs
+
+    liste()
+    liste((1, 2, 3))
+
+    tuple([1, 2, 3])
+    dictionnaire([("nom", "PyQ")])
+
+Sans argument, `liste()`, `tuple()` et `dictionnaire()` créent respectivement une collection vide.
+
+## Numéroter les éléments
+
+`enumerer()` renvoie une liste de paires contenant l'index et la valeur.
+
+    afficher(enumerer(["rouge", "vert", "bleu"]))
+
+## Trier
+
+`trier()` renvoie une nouvelle liste triée. Le deuxième argument facultatif active l'ordre décroissant.
+
+    afficher(trier([3, 1, 2]))
+    afficher(trier([3, 1, 2], vrai))
+
+## Inverser
+
+`inverser()` renvoie une nouvelle liste contenant les éléments dans l'ordre inverse.
+
+    afficher(inverser([1, 2, 3]))
+
+Ces fonctions ne modifient pas la collection d'origine.
