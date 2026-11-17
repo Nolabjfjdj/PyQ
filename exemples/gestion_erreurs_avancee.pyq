@@ -1,0 +1,15 @@
+valeur = 10
+
+essayer:
+    resultat = valeur / 0
+    afficher(resultat)
+sauf erreur:
+    afficher("Erreur interceptée :")
+    afficher(erreur)
+enfin:
+    afficher("Bloc final exécuté")
+
+essayer:
+    afficher("Deuxième test")
+sauf:
+    afficher("Erreur interceptée sans variable")
