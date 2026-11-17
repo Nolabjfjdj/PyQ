@@ -58,6 +58,8 @@ PyQ prend actuellement en charge :
 - `continuer`
 - Listes
 - Listes imbriquées
+- Constructeurs `liste()`, `tuple()` et `dictionnaire()`
+- Fonctions de collections `enumerer()`, `trier()` et `inverser()`
 - Dictionnaires
 - Dictionnaires imbriqués
 - Accès et modification des éléments
