@@ -1424,6 +1424,14 @@ Les listes disposent notamment des méthodes suivantes :
     liste.ajouter_tout(collection)
     liste.retirer_dernier()
 
+Les tuples proposent également des méthodes de consultation :
+
+    tuple.taille()
+    tuple.contient(valeur)
+    tuple.compter(valeur)
+    tuple.position(valeur)
+    tuple.inverser()
+
 Les dictionnaires disposent notamment de :
 
     dictionnaire.cles()
