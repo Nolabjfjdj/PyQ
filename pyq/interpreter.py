@@ -994,11 +994,16 @@ class Interpreter:
                         node
                     )
 
-                source = arguments[0] if arguments else None
+                if not arguments:
+                    if node.name == "liste":
+                        return []
+                    if node.name == "tuple":
+                        return ()
+                    return {}
+
+                source = arguments[0]
 
                 if node.name == "liste":
-                    if source is None:
-                        return []
                     try:
                         return list(source)
                     except TypeError as error:
@@ -1008,8 +1013,6 @@ class Interpreter:
                         ) from error
 
                 if node.name == "tuple":
-                    if source is None:
-                        return ()
                     try:
                         return tuple(source)
                     except TypeError as error:
@@ -1018,8 +1021,6 @@ class Interpreter:
                             node
                         ) from error
 
-                if source is None:
-                    return {}
                 try:
                     return dict(source)
                 except (TypeError, ValueError) as error:
@@ -1389,7 +1390,7 @@ class Interpreter:
             iterable = arguments[0]
             start = arguments[1] if len(arguments) == 2 else 0
 
-            if not isinstance(iterable, (list, tuple, range)):
+            if not isinstance(iterable, (list, tuple, range, set)):
                 raise PyQRuntimeError(
                     "somme() attend une liste, un tuple ou un intervalle",
                     node
@@ -1430,7 +1431,7 @@ class Interpreter:
             if len(arguments) == 1:
                 iterable = arguments[0]
 
-                if not isinstance(iterable, (str, list, tuple, range, dict)):
+                if not isinstance(iterable, (str, list, tuple, range, dict, set)):
                     raise PyQRuntimeError(
                         f"{node.name}() attend une chaîne, une liste, un tuple, un dictionnaire ou un intervalle",
                         node
@@ -1472,11 +1473,11 @@ class Interpreter:
 
             value = arguments[0]
 
-            if isinstance(value, (str, list, tuple, dict, range)):
+            if isinstance(value, (str, list, tuple, dict, range, set)):
                 return len(value)
 
             raise PyQRuntimeError(
-                "taille() attend une chaîne, une liste, un tuple, un dictionnaire ou un intervalle",
+                "taille() attend une chaîne, une liste, un tuple, un dictionnaire, un ensemble ou un intervalle",
                 node
             )
 
