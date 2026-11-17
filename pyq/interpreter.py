@@ -811,6 +811,91 @@ class Interpreter:
 
         arguments = positional_arguments
 
+        if node.name in ("texte", "entier", "decimal", "booleen", "type_de"):
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    f"{node.name}() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if node.name == "texte":
+                return self.format_value(value)
+
+            if node.name == "booleen":
+                return self.is_truthy(value)
+
+            if node.name == "type_de":
+                if value is None:
+                    return "nul"
+                if isinstance(value, bool):
+                    return "booleen"
+                if isinstance(value, int):
+                    return "entier"
+                if isinstance(value, float):
+                    return "decimal"
+                if isinstance(value, str):
+                    return "texte"
+                if isinstance(value, list):
+                    return "liste"
+                if isinstance(value, tuple):
+                    return "tuple"
+                if isinstance(value, dict):
+                    return "dictionnaire"
+                if isinstance(value, set):
+                    return "ensemble"
+                return "objet"
+
+            if node.name == "entier":
+                if isinstance(value, bool):
+                    return int(value)
+                try:
+                    return int(value)
+                except (TypeError, ValueError, OverflowError) as error:
+                    raise PyQRuntimeError(
+                        "entier() ne peut pas convertir cette valeur",
+                        node
+                    ) from error
+
+            if node.name == "decimal":
+                if isinstance(value, bool):
+                    return float(value)
+                try:
+                    return float(value)
+                except (TypeError, ValueError, OverflowError) as error:
+                    raise PyQRuntimeError(
+                        "decimal() ne peut pas convertir cette valeur",
+                        node
+                    ) from error
+
+        if node.name in (
+            "est_nombre", "est_texte", "est_liste",
+            "est_tuple", "est_dictionnaire", "est_booleen",
+            "est_nul"
+        ):
+            if len(arguments) != 1 or named_arguments:
+                raise PyQRuntimeError(
+                    f"{node.name}() attend exactement un argument",
+                    node
+                )
+
+            value = arguments[0]
+
+            if node.name == "est_nombre":
+                return isinstance(value, (int, float)) and not isinstance(value, bool)
+            if node.name == "est_texte":
+                return isinstance(value, str)
+            if node.name == "est_liste":
+                return isinstance(value, list)
+            if node.name == "est_tuple":
+                return isinstance(value, tuple)
+            if node.name == "est_dictionnaire":
+                return isinstance(value, dict)
+            if node.name == "est_booleen":
+                return isinstance(value, bool)
+            return value is None
+
         if node.name == "puissance":
             if len(arguments) != 2 or named_arguments:
                 raise PyQRuntimeError(
